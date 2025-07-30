@@ -71,7 +71,7 @@ export default function decorateArea(area = document) {
     eagerLoad(marquee, 'div:last-child > div:last-child img');
   }());
 
-  if (getMetadata('event-details-page') !== 'yes') return;
+  // if (getMetadata('event-details-page') !== 'yes') return;
 
   // const photosData = parsePhotosData(area);
 
