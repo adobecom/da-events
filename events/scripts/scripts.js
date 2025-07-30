@@ -86,7 +86,7 @@ export default function decorateArea(area = document) {
 const prodDomains = ['milo.adobe.com', 'business.adobe.com', 'www.adobe.com', 'news.adobe.com', 'helpx.adobe.com'];
 
 // Add project-wide style path here.
-const STYLES = ['/events/styles/styles.css'];
+const STYLES = [`${window.location.origin}/events/styles/styles.css`];
 
 
 // Add any config options.
