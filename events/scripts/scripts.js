@@ -15,8 +15,8 @@
 // import { getSusiOptions, setMetadata, getMetadata, getEventServiceEnv } from './utils.js';
 
 
-export function setLibs(location) {
-  const { hostname, search } = location;
+export function setLibs() {
+  const { hostname, search } = window.location;
   if (!['.aem.', '.hlx.', '.stage.', 'local'].some((i) => hostname.includes(i))) return '/libs';
   const branch = new URLSearchParams(search).get('milolibs') || 'main';
   if (branch === 'local') return 'http://localhost:6456/libs';
