@@ -1,7 +1,90 @@
 <!-- Modifying this file will impact your performance -->
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>
+  const libs = (() => {
+    const { hostname, search } = window.location;
+    if (
+      !['.aem.', '.hlx.', '.stage.', 'local'].some((i) => hostname.includes(i))
+    )
+      return '/libs';
+    const branch = new URLSearchParams(search).get('milolibs') || 'main';
+    if (branch === 'local') return 'http://localhost:6456/libs';
+    return branch.includes('--')
+      ? `https://${branch}.aem.live/libs`
+      : `https://${branch}--milo--adobecom.aem.live/libs`;
+  })();
+
+  const miloStyles = document.createElement('link');
+  const miloUtils = document.createElement('link');
+  const miloDecorate = document.createElement('link');
+
+  miloStyles.setAttribute('as', 'style');
+  miloStyles.setAttribute('href', `${libs}/styles/styles.css`);
+
+  [miloUtils, miloDecorate].forEach((tag) => {
+    tag.setAttribute('crossorigin', 'true');
+    tag.setAttribute('as', 'script');
+  });
+
+  miloUtils.setAttribute('href', `${libs}/utils/utils.js`);
+  miloDecorate.setAttribute('href', `${libs}/utils/decorate.js`);
+
+  [miloStyles, miloUtils, miloDecorate].forEach((tag) =>
+    tag.setAttribute('rel', 'preload')
+  );
+  document.head.append(miloStyles, miloUtils, miloDecorate);
+
+  // example string: ae_ar: ae; ae_en: en; be_en: en-BE
+  function parseHrefLangString(str) {
+    if (!str) return [];
+    return str.split(';').map((langPair) => {
+      const [locale, lang] = langPair.split(':');
+      return { locale: locale.trim(), lang: lang.trim() };
+    });
+  }
+
+  function buildLink(language, url) {
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'alternate');
+    link.setAttribute('hreflang', language?.toLowerCase());
+    link.setAttribute('href', url);
+    return link;
+  }
+
+  const hrefLangMeta = document.querySelector('meta[name="hreflang"]');
+
+  if (hrefLangMeta) {
+    const { origin, pathname } = window.location;
+    const defaults = [
+      { locale: '', lang: 'x-default' },
+      { locale: '', lang: 'en-us' },
+    ];
+    const localeMap = parseHrefLangString(hrefLangMeta.content);
+    const pageLocale = localeMap.reduce((rdx, pair) => {
+      if (pathname.includes(`/${pair.locale.toLowerCase()}/`))
+        rdx += pair.locale;
+      return rdx;
+    }, '');
+    const defaultPath = pageLocale
+      ? pathname.replace(`/${pageLocale}`, '')
+      : pathname;
+    const xDefault = buildLink('x-default', `${origin}${defaultPath}`);
+    const enUs = buildLink('en-us', `${origin}${defaultPath}`);
+
+    const links = localeMap.reduce((rdx, { locale, lang }) => {
+      rdx.push(buildLink(lang, `${origin}/${locale}${defaultPath}`));
+      return rdx;
+    }, []);
+
+    document.head.querySelector('title').after(xDefault, enUs, ...links);
+  }
+</script>
 <script src="/events/scripts/fallback.js" nomodule></script>
 <script src="/events/scripts/scripts.js" type="module"></script>
-<link rel="stylesheet" href="/events/styles/styles.css">
-<style>body { display: none; }</style>
-<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/events/styles/styles.css" />
+<style>
+  body {
+    display: none;
+  }
+</style>
+<link rel="icon" href="data:," />
