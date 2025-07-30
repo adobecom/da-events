@@ -10,9 +10,20 @@
  * governing permissions and limitations under the License.
  */
 
-import { lazyCaptureProfile } from './profile.js';
-import autoUpdateContent, { getNonProdData, validatePageAndRedirect } from './content-update.js';
-import { getSusiOptions, setMetadata, getMetadata, getEventServiceEnv, LIBS } from './utils.js';
+// import { lazyCaptureProfile } from './profile.js';
+// import autoUpdateContent, { getNonProdData, validatePageAndRedirect } from './content-update.js';
+// import { getSusiOptions, setMetadata, getMetadata, getEventServiceEnv } from './utils.js';
+
+
+export function setLibs(location) {
+  const { hostname, search } = location;
+  if (!['.aem.', '.hlx.', '.stage.', 'local'].some((i) => hostname.includes(i))) return '/libs';
+  const branch = new URLSearchParams(search).get('milolibs') || 'main';
+  if (branch === 'local') return 'http://localhost:6456/libs';
+  return branch.includes('--') ? `https://${branch}.aem.live/libs` : `https://${branch}--milo--adobecom.aem.live/libs`;
+}
+
+export const LIBS = setLibs();
 
 const {
   loadArea,
@@ -62,14 +73,14 @@ export default function decorateArea(area = document) {
 
   if (getMetadata('event-details-page') !== 'yes') return;
 
-  const photosData = parsePhotosData(area);
+  // const photosData = parsePhotosData(area);
 
   const miloDeps = {
     miloLibs: LIBS,
     getConfig,
   };
 
-  autoUpdateContent(area, miloDeps, photosData);
+  // autoUpdateContent(area, miloDeps, photosData);
 }
 
 const prodDomains = ['milo.adobe.com', 'business.adobe.com', 'www.adobe.com', 'news.adobe.com', 'helpx.adobe.com'];
@@ -199,8 +210,8 @@ const CONFIG = {
   },
 };
 
-const MILO_CONFIG = setConfig({ ...CONFIG });
-updateConfig({ ...MILO_CONFIG, signInContext: getSusiOptions(MILO_CONFIG) });
+// const MILO_CONFIG = setConfig({ ...CONFIG });
+// updateConfig({ ...MILO_CONFIG, signInContext: getSusiOptions(MILO_CONFIG) });
 
 function renderWithNonProdMetadata() {
   const isEventDetailsPage = getMetadata('event-details-page') === 'yes';
@@ -253,10 +264,10 @@ replaceDotMedia(document);
 decorateArea();
 
 // fetch metadata json and decorate again if non-prod or prod + preview mode
-if (renderWithNonProdMetadata()) await fetchAndDecorateArea();
+// if (renderWithNonProdMetadata()) await fetchAndDecorateArea();
 
 // Validate the page and redirect if is event-details-page
-if (getMetadata('event-details-page') === 'yes') await validatePageAndRedirect(LIBS);
+// if (getMetadata('event-details-page') === 'yes') await validatePageAndRedirect(LIBS);
 
 /*
  * ------------------------------------------------------------
@@ -278,7 +289,7 @@ if (getMetadata('event-details-page') === 'yes') await validatePageAndRedirect(L
 (async function loadPage() {
   await loadLana({ clientId: 'events-milo' });
   await loadArea().then(() => {
-    if (getMetadata('event-details-page') === 'yes') lazyCaptureProfile();
+    // if (getMetadata('event-details-page') === 'yes') lazyCaptureProfile();
   });
 }());
 
