@@ -290,9 +290,8 @@ decorateArea();
 
 (async function loadPage() {
   await loadLana({ clientId: 'events-milo' });
-  await loadArea().then(() => {
-    // if (getMetadata('event-details-page') === 'yes') lazyCaptureProfile();
-  });
+  setConfig({ ...CONFIG, miloLibs: LIBS });
+  await loadArea();
 }());
 
 (async function loadDa() {
