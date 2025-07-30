@@ -86,7 +86,8 @@ export default function decorateArea(area = document) {
 const prodDomains = ['milo.adobe.com', 'business.adobe.com', 'www.adobe.com', 'news.adobe.com', 'helpx.adobe.com'];
 
 // Add project-wide style path here.
-const STYLES = '';
+const STYLES = ['/events/styles/styles.css'];
+
 
 // Add any config options.
 const CONFIG = {
@@ -277,7 +278,7 @@ decorateArea();
 
 (function loadStyles() {
   const paths = [`${LIBS}/styles/styles.css`];
-  if (STYLES) { paths.push(STYLES); }
+  if (STYLES) { paths.push(...(Array.isArray(STYLES) ? STYLES : [STYLES])); }
   paths.forEach((path) => {
     const link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
