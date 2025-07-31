@@ -26,8 +26,8 @@ jobs:
         id: generate_token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.FG_SYNC_APP_ID }}
-          private-key: ${{ secrets.FG_SYNC_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.DA_SYNC_APP_ID }}
+          private-key: ${{ secrets.DA_SYNC_APP_SECRET }}
           owner: ${{ github.repository_owner }}
           repositories: "da-events-pink"
 
