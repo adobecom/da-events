@@ -69,7 +69,7 @@ const CONFIG = {
   // imsScope: 'AdobeID,openid,gnav',
   // geoRouting: 'off',
   // fallbackRouting: 'off',
-  decorateArea,
+  // decorateArea,
   locales: {
     '': { ietf: 'en-US', tk: 'hah7vzn.css' },
     ae_ar: { ietf: 'ar', tk: 'qxw8hzm.css', dir: 'rtl' },
