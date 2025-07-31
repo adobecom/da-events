@@ -10,11 +10,6 @@
  * governing permissions and limitations under the License.
  */
 
-// import { lazyCaptureProfile } from './profile.js';
-// import autoUpdateContent, { getNonProdData, validatePageAndRedirect } from './content-update.js';
-// import { getSusiOptions, setMetadata, getMetadata, getEventServiceEnv } from './utils.js';
-
-
 export function setLibs() {
   const { hostname, search } = window.location;
   if (!['.aem.', '.hlx.', '.stage.', 'local'].some((i) => hostname.includes(i))) return '/libs';
@@ -28,31 +23,11 @@ export const LIBS = setLibs();
 const {
   loadArea,
   setConfig,
-  updateConfig,
-  getConfig,
   loadLana,
   getLocale,
 } = await import(`${LIBS}/utils/utils.js`);
 
 export default function decorateArea(area = document) {
-  const parsePhotosData = () => {
-    const output = {};
-
-    if (!area) return output;
-
-    try {
-      const photosData = JSON.parse(getMetadata('photos'));
-
-      photosData.forEach((photo) => {
-        output[photo.imageKind] = photo;
-      });
-    } catch (e) {
-      window.lana?.log(`Failed to parse photos metadata:\n${JSON.stringify(e, null, 2)}`);
-    }
-
-    return output;
-  };
-
   const eagerLoad = (parent, selector) => {
     const img = parent.querySelector(selector);
     img?.removeAttribute('loading');
@@ -70,17 +45,6 @@ export default function decorateArea(area = document) {
     // Last image of last column of last row
     eagerLoad(marquee, 'div:last-child > div:last-child img');
   }());
-
-  // if (getMetadata('event-details-page') !== 'yes') return;
-
-  // const photosData = parsePhotosData(area);
-
-  const miloDeps = {
-    miloLibs: LIBS,
-    getConfig,
-  };
-
-  // autoUpdateContent(area, miloDeps, photosData);
 }
 
 const prodDomains = ['milo.adobe.com', 'business.adobe.com', 'www.adobe.com', 'news.adobe.com', 'helpx.adobe.com'];
@@ -212,39 +176,6 @@ const CONFIG = {
   },
 };
 
-// const MILO_CONFIG = setConfig({ ...CONFIG });
-// updateConfig({ ...MILO_CONFIG, signInContext: getSusiOptions(MILO_CONFIG) });
-
-function renderWithNonProdMetadata() {
-  const isEventDetailsPage = getMetadata('event-details-page') === 'yes';
-
-  if (!isEventDetailsPage) return false;
-
-  const isLiveProd = getEventServiceEnv() === 'prod' && window.location.hostname === 'www.adobe.com';
-  const isMissingEventId = !getMetadata('event-id');
-
-  if (!isLiveProd && isMissingEventId) return true;
-
-  const isPreviewMode = new URLSearchParams(window.location.search).get('previewMode');
-
-  if (isLiveProd && isPreviewMode) return true;
-
-  return false;
-}
-
-async function fetchAndDecorateArea() {
-  // Load non-prod data for stage and dev environments
-  let env = getEventServiceEnv();
-  if (env === 'local') env = 'dev';
-  const nonProdData = await getNonProdData(env);
-  if (!nonProdData) return;
-  Object.entries(nonProdData).forEach(([key, value]) => {
-    setMetadata(key, value);
-  });
-
-  decorateArea();
-}
-
 function replaceDotMedia(area = document) {
   const { prefix } = getLocale(CONFIG.locales);
   const currUrl = new URL(window.location);
@@ -264,12 +195,6 @@ replaceDotMedia(document);
 // Decorate the page with site specific needs.
 
 decorateArea();
-
-// fetch metadata json and decorate again if non-prod or prod + preview mode
-// if (renderWithNonProdMetadata()) await fetchAndDecorateArea();
-
-// Validate the page and redirect if is event-details-page
-// if (getMetadata('event-details-page') === 'yes') await validatePageAndRedirect(LIBS);
 
 /*
  * ------------------------------------------------------------

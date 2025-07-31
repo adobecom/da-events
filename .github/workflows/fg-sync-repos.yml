@@ -5,6 +5,7 @@ on:
     branches:
       - stage
       - main
+      - da-setup
   workflow_dispatch:
     inputs:
       syncBranch:
@@ -15,6 +16,7 @@ on:
         options:
           - 'stage'
           - 'main'
+          - 'da-setup'
 
 jobs:
   build:
