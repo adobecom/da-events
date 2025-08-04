@@ -3,6 +3,7 @@ name: Floodgate Repo Sync
 on:
   push:
     branches:
+      - dev
       - stage
       - main
   workflow_dispatch:
@@ -13,6 +14,7 @@ on:
         default: 'stage'
         type: choice
         options:
+          - 'dev'
           - 'stage'
           - 'main'
 
