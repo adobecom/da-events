@@ -288,4 +288,6 @@ async function loadPage() {
   import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(loadPage));
 }());
 
-loadPage();
+(async function init() {
+  await loadPage()
+})()
