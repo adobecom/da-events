@@ -24,22 +24,27 @@ jobs:
         id: generate_token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.FG_SYNC_APP_ID }}
-          private-key: ${{ secrets.FG_SYNC_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.DA_SYNC_APP_ID }}
+          private-key: ${{ secrets.DA_SYNC_APP_SECRET }}
           owner: ${{ github.repository_owner }}
-          repositories: "da-events-pink"
+          repositories: "da-events-pink,da-events-blue"
 
       - name: Checkout Repo
         uses: actions/checkout@v3
         with:
           ref: ${{ inputs.syncBranch || github.ref_name }}
 
-      - name: Clone Floodgate Repository and Checkout Selected Branch
+      - name: Clone Floodgate Repositories and Checkout Selected Branch
         run: |
           git clone https://github.com/adobecom/da-events-pink.git ../da-events-pink
+          git clone https://github.com/adobecom/da-events-blue.git ../da-events-blue
           cd ../da-events-pink
           git checkout $FG_SYNC_BRANCH
           echo "da-events-pink branch"
+          git branch
+          cd ../da-events-blue
+          git checkout $FG_SYNC_BRANCH
+          echo "da-events-blue branch"
           git branch
           cd ../da-events
           echo "da-events branch"
@@ -47,11 +52,15 @@ jobs:
         env:
           FG_SYNC_BRANCH: ${{ inputs.syncBranch || github.ref_name }}
 
-      - name: Overwrite floodgate repo files with latest from source repo
+      - name: Overwrite da-events-pink repo files with latest from source repo
         run: |
-          rsync -av --exclude='fstab.yaml' --exclude='.github' --exclude='.kodiak' --exclude='.git' --exclude='.idea' --exclude='.husky' --exclude='.vscode' --exclude='tools/sidekick/config.json' ./ ../bacom-pink/
+          rsync -av --exclude='fstab.yaml' --exclude='.github' --exclude='.kodiak' --exclude='.git' --exclude='.idea' --exclude='.husky' --exclude='.vscode' --exclude='tools/sidekick/config.json' ./ ../da-events-pink/
 
-      - name: Commit and Push Changes to Floodgate Repository
+      - name: Overwrite da-events-blue repo files with latest from source repo
+        run: |
+          rsync -av --exclude='fstab.yaml' --exclude='.github' --exclude='.kodiak' --exclude='.git' --exclude='.idea' --exclude='.husky' --exclude='.vscode' --exclude='tools/sidekick/config.json' ./ ../da-events-blue/
+
+      - name: Commit and Push Changes to da-events-pink Repository
         run: |
           cd ../da-events-pink
           echo "da-events-pink branch"
@@ -67,7 +76,31 @@ jobs:
             git push origin $FG_SYNC_BRANCH --force
             echo ":heavy_check_mark: Syncing branch $FG_SYNC_BRANCH on da-events to da-events-pink completed successfully." >> $GITHUB_STEP_SUMMARY
           else
-            echo ":heavy_minus_sign: No changes detected on branch $FG_SYNC_BRANCH, nothing to sync." >> $GITHUB_STEP_SUMMARY
+            echo ":heavy_minus_sign: No changes detected on branch $FG_SYNC_BRANCH for da-events-pink, nothing to sync." >> $GITHUB_STEP_SUMMARY
+          fi
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          FG_SYNC_BOT_EMAIL: ${{ secrets.FG_SYNC_BOT_EMAIL }}
+          FG_SYNC_BOT_NAME: ${{ secrets.FG_SYNC_BOT_NAME }}
+          FG_SYNC_BRANCH: ${{ inputs.syncBranch || github.ref_name }}
+
+      - name: Commit and Push Changes to da-events-blue Repository
+        run: |
+          cd ../da-events-blue
+          echo "da-events-blue branch"
+          git branch
+          git config user.email "$FG_SYNC_BOT_EMAIL"
+          git config user.name "$FG_SYNC_BOT_NAME"
+          git status
+          if [[ -n $(git status -s) ]]; then
+            git remote set-url origin https://oauth2:$GITHUB_TOKEN@github.com/adobecom/da-events-blue.git
+            git remote -v
+            git add .
+            git commit -m "Syncing da-events to da-events-blue"
+            git push origin $FG_SYNC_BRANCH --force
+            echo ":heavy_check_mark: Syncing branch $FG_SYNC_BRANCH on da-events to da-events-blue completed successfully." >> $GITHUB_STEP_SUMMARY
+          else
+            echo ":heavy_minus_sign: No changes detected on branch $FG_SYNC_BRANCH for da-events-blue, nothing to sync." >> $GITHUB_STEP_SUMMARY
           fi
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
