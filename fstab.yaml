@@ -1,5 +1,0 @@
-mountpoints:
-  /:
-    url: https://content.da.live/adobecom/da-events/
-    type: markup
-
