@@ -60,12 +60,12 @@ export default function decorateArea(area = document) {
     eagerLoad(marquee, 'div:last-child > div:last-child img');
   }());
 
-  if (getMetadata('event-details-page') !== 'yes') return;
+  if (!getMetadata('event-id')) return;
   decorateEvent(area);
 }
 
 function renderWithNonProdMetadata() {
-  const isEventDetailsPage = getMetadata('event-details-page') === 'yes';
+  const isEventDetailsPage = getMetadata('event-id');
 
   if (!isEventDetailsPage) return false;
 
