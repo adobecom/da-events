@@ -277,10 +277,11 @@ if (EVENT_CONFIG.cmsType === 'SP') {
 
 async function loadPage() {
   await loadLana({ clientId: 'events-milo' });
-  await loadArea().then(async () => {
+  await loadArea();
+  if (getMetadata('event-id')) {
     const { eventsDelayedActions } = await import(`${EVENT_LIBS}/libs.js`);
-    if (getMetadata('event-details-page') === 'yes') eventsDelayedActions();
-  });
+    eventsDelayedActions();
+  }
 }
 
 (async function loadDa() {
