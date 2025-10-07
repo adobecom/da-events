@@ -15,7 +15,7 @@ import {
   EVENT_LIBS,
 } from './utils.js';
 
-const E_CONFIG = { cmsType: 'SP' };
+const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
   // pick your own subset of blocks if preferred
 ];
