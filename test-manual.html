@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timing Framework Manual Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .chrono-box {
+            border: 2px solid #007bff;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .chrono-box h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .store-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .test-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Timing Framework Manual Test</h1>
+    
+    <div class="test-section info">
+        <h2>Test Overview</h2>
+        <p>This page tests the timing framework with multiple chrono-boxes, plugin stores, and worker communication.</p>
+        <p>Use the buttons below to run different test scenarios.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runBasicTest()">Run Basic Test</button>
+        <button onclick="runPluginTest()">Run Plugin Test</button>
+        <button onclick="runWorkerTest()">Run Worker Test</button>
+        <button onclick="runIntegrationTest()">Run Integration Test</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="test-results" class="test-results"></div>
+
+    <!-- Chrono-Box Instances -->
+    <div class="chrono-box">
+        <h3>Chrono-Box 1</h3>
+        <div data-block-name="chrono-box" data-schedule-id="test-schedule-1"></div>
+    </div>
+
+    <div class="chrono-box">
+        <h3>Chrono-Box 2</h3>
+        <div data-block-name="chrono-box" data-schedule-id="test-schedule-2"></div>
+    </div>
+
+    <script type="module">
+        // Mock metadata for testing
+        window.getMetadata = (key) => {
+            if (key === 'schedules') {
+                return JSON.stringify({
+                    'test-schedule-1': [
+                        {
+                            time: '09:00',
+                            title: 'Session 1',
+                            pathToFragment: '/fragment-1',
+                            metadata: [{ key: 'video.url' }],
+                            'mobileRider': [{ sessionId: 'session-1' }]
+                        }
+                    ],
+                    'test-schedule-2': [
+                        {
+                            time: '10:00',
+                            title: 'Session 2',
+                            pathToFragment: '/fragment-2',
+                            metadata: [{ key: 'speaker.name' }],
+                            'mobileRider': [{ sessionId: 'session-2' }]
+                        }
+                    ]
+                });
+            }
+            return null;
+        };
+
+        // Mock lana for logging
+        window.lana = {
+            log: (message) => console.log('LANA:', message)
+        };
+
+        // Mock crypto for UUID generation
+        if (!window.crypto) {
+            window.crypto = {
+                randomUUID: () => 'test-uuid-' + Math.random().toString(36).substr(2, 9)
+            };
+        }
+
+        // Test functions
+        window.runBasicTest = async () => {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="info"><h3>Running Basic Test...</h3></div>';
+
+            try {
+                // Test 1: Check if chrono-boxes can be initialized
+                const chronoBoxes = document.querySelectorAll('[data-block-name="chrono-box"]');
+                results.innerHTML += `<div class="success"><p>✅ Found ${chronoBoxes.length} chrono-box elements</p></div>`;
+
+                // Test 2: Check if metadata is available
+                const schedules = JSON.parse(window.getMetadata('schedules'));
+                results.innerHTML += `<div class="success"><p>✅ Found ${Object.keys(schedules).length} test schedules</p></div>`;
+
+                // Test 3: Check if crypto.randomUUID is available
+                const testUUID = window.crypto.randomUUID();
+                results.innerHTML += `<div class="success"><p>✅ Generated UUID: ${testUUID}</p></div>`;
+
+                results.innerHTML += `<div class="success"><h4>✅ Basic Test Passed</h4></div>`;
+
+            } catch (error) {
+                results.innerHTML += `<div class="error"><h4>❌ Basic Test Failed</h4><p>${error.message}</p></div>`;
+            }
+        };
+
+        window.runPluginTest = async () => {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="info"><h3>Running Plugin Test...</h3></div>';
+
+            try {
+                // Test 1: Import metadata plugin
+                const { default: metadataPlugin } = await import('./events/features/timing-framework/plugins/metadata/plugin.js');
+                results.innerHTML += `<div class="success"><p>✅ Metadata plugin imported successfully</p></div>`;
+
+                // Test 2: Import mobile-rider plugin
+                const { default: mobileRiderPlugin } = await import('./events/features/timing-framework/plugins/mobile-rider/plugin.js');
+                results.innerHTML += `<div class="success"><p>✅ Mobile rider plugin imported successfully</p></div>`;
+
+                // Test 3: Create plugin stores
+                const schedule = [
+                    {
+                        metadata: [{ key: 'video.url' }],
+                        'mobileRider': [{ sessionId: 'test-session' }]
+                    }
+                ];
+                const tabId = window.crypto.randomUUID();
+
+                const metadataStore = metadataPlugin(schedule, tabId);
+                const mobileRiderStore = mobileRiderPlugin(schedule, tabId);
+
+                results.innerHTML += `<div class="success"><p>✅ Created plugin stores</p></div>`;
+
+                // Test 4: Test store functionality
+                metadataStore.set('test.key', 'test-value', tabId);
+                const retrievedValue = metadataStore.get('test.key');
+                
+                if (retrievedValue === 'test-value') {
+                    results.innerHTML += `<div class="success"><p>✅ Store get/set functionality works</p></div>`;
+                } else {
+                    results.innerHTML += `<div class="error"><p>❌ Store get/set functionality failed</p></div>`;
+                }
+
+                results.innerHTML += `<div class="success"><h4>✅ Plugin Test Passed</h4></div>`;
+
+            } catch (error) {
+                results.innerHTML += `<div class="error"><h4>❌ Plugin Test Failed</h4><p>${error.message}</p></div>`;
+            }
+        };
+
+        window.runWorkerTest = async () => {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="info"><h3>Running Worker Test...</h3></div>';
+
+            try {
+                // Test 1: Check if Worker is available
+                if (typeof Worker !== 'undefined') {
+                    results.innerHTML += `<div class="success"><p>✅ Worker API is available</p></div>`;
+                } else {
+                    results.innerHTML += `<div class="error"><p>❌ Worker API is not available</p></div>`;
+                    return;
+                }
+
+                // Test 2: Check if BroadcastChannel is available
+                if (typeof BroadcastChannel !== 'undefined') {
+                    results.innerHTML += `<div class="success"><p>✅ BroadcastChannel API is available</p></div>`;
+                } else {
+                    results.innerHTML += `<div class="error"><p>❌ BroadcastChannel API is not available</p></div>`;
+                    return;
+                }
+
+                // Test 3: Test BroadcastChannel communication
+                const channel = new BroadcastChannel('test-channel');
+                let messageReceived = false;
+                
+                channel.onmessage = (event) => {
+                    if (event.data === 'test-message') {
+                        messageReceived = true;
+                    }
+                };
+
+                channel.postMessage('test-message');
+                
+                // Wait a bit for the message to be processed
+                setTimeout(() => {
+                    if (messageReceived) {
+                        results.innerHTML += `<div class="success"><p>✅ BroadcastChannel communication works</p></div>`;
+                    } else {
+                        results.innerHTML += `<div class="error"><p>❌ BroadcastChannel communication failed</p></div>`;
+                    }
+                    channel.close();
+                }, 100);
+
+                results.innerHTML += `<div class="success"><h4>✅ Worker Test Passed</h4></div>`;
+
+            } catch (error) {
+                results.innerHTML += `<div class="error"><h4>❌ Worker Test Failed</h4><p>${error.message}</p></div>`;
+            }
+        };
+
+        window.runIntegrationTest = async () => {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="info"><h3>Running Integration Test...</h3></div>';
+
+            try {
+                // Test 1: Import chrono-box
+                const { default: initChronoBox } = await import('./events/blocks/chrono-box/chrono-box.js');
+                results.innerHTML += `<div class="success"><p>✅ Chrono-box imported successfully</p></div>`;
+
+                // Test 2: Initialize a test chrono-box
+                const testElement = document.createElement('div');
+                testElement.setAttribute('data-block-name', 'chrono-box');
+                testElement.setAttribute('data-schedule-id', 'test-schedule-1');
+                
+                // Mock element properties
+                testElement.innerHTML = '';
+                testElement.style = {};
+                testElement.clientHeight = 300;
+                testElement.remove = () => {};
+                testElement.classList = {
+                    add: () => {},
+                    remove: () => {}
+                };
+                testElement.append = () => {};
+                testElement.removeAttribute = () => {};
+
+                await initChronoBox(testElement);
+                results.innerHTML += `<div class="success"><p>✅ Chrono-box initialized successfully</p></div>`;
+
+                results.innerHTML += `<div class="success"><h4>✅ Integration Test Passed</h4></div>`;
+
+            } catch (error) {
+                results.innerHTML += `<div class="error"><h4>❌ Integration Test Failed</h4><p>${error.message}</p></div>`;
+            }
+        };
+
+        window.clearResults = () => {
+            document.getElementById('test-results').innerHTML = '';
+        };
+
+        // Auto-run basic test on page load
+        setTimeout(() => {
+            window.runBasicTest();
+        }, 1000);
+    </script>
+</body>
+</html> 

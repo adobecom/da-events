@@ -8,7 +8,7 @@ const body = await readFile({ path: './mocks/default.html' });
 describe('Venue Additional Info', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    document.body.classList.remove('timing-post-event');
+    delete document.body.dataset.eventState;
     document.head.innerHTML = '';
     window.isTestEnv = true;
   });

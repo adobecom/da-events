@@ -183,8 +183,8 @@ describe('Agenda Module', () => {
       expect(el.parentNode).to.be.null;
     });
 
-    it('should remove element if metadata "show-agenda-post-event" is not "true" and body has class "timing-post-event"', async () => {
-      document.body.classList.add('timing-post-event');
+    it('should remove element if metadata "show-agenda-post-event" is not "true" and body has eventState "post-event"', async () => {
+      document.body.dataset.eventState = 'post-event';
       setMetadata('show-agenda-post-event', 'false');
 
       const el = document.querySelector('.event-agenda');

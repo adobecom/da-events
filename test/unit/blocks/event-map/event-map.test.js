@@ -9,7 +9,7 @@ const faulty = await readFile({ path: './mocks/faulty.html' });
 describe('Event Map', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    document.body.classList.remove('timing-post-event');
+    delete document.body.dataset.eventState;
     document.head.innerHTML = '';
     window.isTestEnv = true;
     setMetadata('venue', JSON.stringify({
@@ -48,7 +48,7 @@ describe('Event Map', () => {
   it('event map does not exist when toggled off for post event', async () => {
     setMetadata('show-venue-post-event', 'false');
     document.body.innerHTML = body;
-    document.body.classList.add('timing-post-event');
+    document.body.dataset.eventState = 'post-event';
     const block = document.querySelector('.event-map');
     await init(block);
     expect(document.querySelector('.event-map')).to.not.exist;
@@ -58,7 +58,7 @@ describe('Event Map', () => {
     setMetadata('show-venue-post-event', 'true');
     setMetadata('show-venue-additional-info-post-event', 'false');
     document.body.innerHTML = body;
-    document.body.classList.add('timing-post-event');
+    document.body.dataset.eventState = 'post-event';
     const block = document.querySelector('.event-map');
     await init(block);
     expect(document.querySelector('.event-map .event-map-wrapper > div > p:last-of-type:has(a)')).to.not.exist;
@@ -68,7 +68,7 @@ describe('Event Map', () => {
     setMetadata('show-venue-post-event', 'true');
     setMetadata('show-venue-additional-info-post-event', 'true');
     document.body.innerHTML = body;
-    document.body.classList.add('timing-post-event');
+    document.body.dataset.eventState = 'post-event';
     const block = document.querySelector('.event-map');
     await init(block);
     expect(document.querySelector('.event-map .event-map-wrapper > div > p:last-of-type:has(a)')).to.exist;
