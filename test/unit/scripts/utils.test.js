@@ -35,7 +35,7 @@ describe('Utils Functions', () => {
       // Test the logic directly
       const hostname = 'www.adobe.com';
       const search = '';
-      
+
       const result = (() => {
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
           return '/libs';
@@ -51,7 +51,7 @@ describe('Utils Functions', () => {
     it('should return localhost URL for local development', () => {
       const hostname = 'localhost';
       const search = '?milolibs=local';
-      
+
       const result = (() => {
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
           return '/libs';
@@ -67,7 +67,7 @@ describe('Utils Functions', () => {
     it('should return branch-specific URL for hlx domains with custom branch', () => {
       const hostname = 'main--milo--adobecom.hlx.page';
       const search = '?milolibs=feature-branch';
-      
+
       const result = (() => {
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
           return '/libs';
@@ -83,7 +83,7 @@ describe('Utils Functions', () => {
     it('should return branch-specific URL for branch with -- in name', () => {
       const hostname = 'main--milo--adobecom.hlx.page';
       const search = '?milolibs=feature--branch';
-      
+
       const result = (() => {
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
           return '/libs';
@@ -101,7 +101,7 @@ describe('Utils Functions', () => {
     it('should return /event-libs for production domains', () => {
       const hostname = 'www.adobe.com';
       const search = '';
-      
+
       const result = (() => {
         const version = 'v1';
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
@@ -123,7 +123,7 @@ describe('Utils Functions', () => {
     it('should return localhost URL for local development', () => {
       const hostname = 'localhost';
       const search = '?eventlibs=local';
-      
+
       const result = (() => {
         const version = 'v1';
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
@@ -145,7 +145,7 @@ describe('Utils Functions', () => {
     it('should return branch-specific URL for hlx domains with custom branch', () => {
       const hostname = 'main--event-libs--adobecom.hlx.page';
       const search = '?eventlibs=feature-branch';
-      
+
       const result = (() => {
         const version = 'v1';
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
@@ -167,7 +167,7 @@ describe('Utils Functions', () => {
     it('should return branch-specific URL for branch with -- in name', () => {
       const hostname = 'main--event-libs--adobecom.hlx.page';
       const search = '?eventlibs=feature--branch';
-      
+
       const result = (() => {
         const version = 'v1';
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
@@ -189,7 +189,7 @@ describe('Utils Functions', () => {
     it('should include version v1 in the path', () => {
       const hostname = 'main--event-libs--adobecom.hlx.page';
       const search = '?eventlibs=test-branch';
-      
+
       const result = (() => {
         const version = 'v1';
         if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
