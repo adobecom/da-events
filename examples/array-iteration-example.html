@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Iteration Example</title>
+    
+    <!-- Example metadata -->
+    <meta name="contacts" content='["John Doe", "Jane Smith", "Bob Johnson"]'>
+    <meta name="speakers" content='[{"name": "Dr. Alice Brown", "title": "Senior Researcher"}, {"name": "Prof. Charlie Wilson", "title": "Professor of Computer Science"}]'>
+    <meta name="event-id" content="example-event-123">
+    <meta name="event-title" content="Tech Conference 2024">
+    
+    <!-- Example with nested structure -->
+    <meta name="event-data" content='{"organizers": ["Adobe Events", "Tech Partners"], "sponsors": ["Adobe", "Microsoft", "Google"], "speakers": [{"name": "Dr. Alice Brown", "title": "Senior Researcher"}, {"name": "Prof. Charlie Wilson", "title": "Professor of Computer Science"}]}'>
+</head>
+<body>
+    <h1>Array Iteration Examples</h1>
+    
+    <section>
+        <h2>Basic Array with Comma</h2>
+        <p>Contact us: [[@array(contacts),]]</p>
+        <!-- Expected output: Contact us: John Doe, Jane Smith, Bob Johnson -->
+    </section>
+    
+    <section>
+        <h2>Custom Separators</h2>
+        <p>Contact us: [[@array(contacts) | ]]</p>
+        <!-- Expected output: Contact us: John Doe | Jane Smith | Bob Johnson -->
+        
+        <p>Contact us: [[@array(contacts) • ]]</p>
+        <!-- Expected output: Contact us: John Doe • Jane Smith • Bob Johnson -->
+        
+        <p>Contact us: [[@array(contacts) - ]]</p>
+        <!-- Expected output: Contact us: John Doe - Jane Smith - Bob Johnson -->
+    </section>
+    
+    <section>
+        <h2>No Separator (Space Default)</h2>
+        <p>Contact us: [[@array(contacts)]]</p>
+        <!-- Expected output: Contact us: John Doe Jane Smith Bob Johnson -->
+    </section>
+    
+    <section>
+        <h2>Nested Array</h2>
+        <p>Organizers: [[@array(event-data.organizers),]]</p>
+        <!-- Expected output: Organizers: Adobe Events, Tech Partners -->
+        
+        <p>Sponsors: [[@array(event-data.sponsors) | ]]</p>
+        <!-- Expected output: Sponsors: Adobe | Microsoft | Google -->
+    </section>
+    
+    <section>
+        <h2>Complex Object Array</h2>
+        <p>Speakers: [[@array(speakers),]]</p>
+        <!-- Expected output: Speakers: [object Object], [object Object] -->
+        <!-- Note: This would need additional processing for object properties -->
+        
+        <p>Speaker Names: [[@array(speakers.name),]]</p>
+        <!-- Expected output: Speaker Names: Dr. Alice Brown, Prof. Charlie Wilson -->
+        
+        <p>Speaker Titles: [[@array(speakers.title) | ]]</p>
+        <!-- Expected output: Speaker Titles: Senior Researcher | Professor of Computer Science -->
+    </section>
+    
+    <section>
+        <h2>Nested Arrays with Objects</h2>
+        <p>Organizers: [[@array(event-data.organizers),]]</p>
+        <!-- Expected output: Organizers: Adobe Events, Tech Partners -->
+        
+        <p>Sponsors: [[@array(event-data.sponsors) | ]]</p>
+        <!-- Expected output: Sponsors: Adobe | Microsoft | Google -->
+        
+        <!-- Example with nested objects -->
+        <p>Speaker Names from Event Data: [[@array(event-data.speakers.name),]]</p>
+        <!-- Expected output: Speaker Names from Event Data: Dr. Alice Brown, Prof. Charlie Wilson -->
+    </section>
+    
+    <section>
+        <h2>Empty Array</h2>
+        <p>No contacts: [[@array(empty-contacts),]]</p>
+        <!-- Expected output: No contacts: (empty) -->
+    </section>
+    
+    <section>
+        <h2>Internationalization Examples</h2>
+        <p>English: [[@array(contacts),]]</p>
+        <!-- Expected output: English: John Doe, Jane Smith, Bob Johnson -->
+        
+        <p>Japanese: [[@array(contacts),]]</p>
+        <!-- Expected output: Japanese: 田中太郎, 佐藤花子, 鈴木一郎 -->
+        
+        <p>Chinese: [[@array(contacts),]]</p>
+        <!-- Expected output: Chinese: 张三, 李四, 王五 -->
+        
+        <p>Japanese with proper separator: [[@array(contacts) 、]]</p>
+        <!-- Expected output: Japanese with proper separator: 田中太郎 佐藤花子 鈴木一郎 -->
+        
+        <p>Chinese with proper separator: [[@array(contacts) ，]]</p>
+        <!-- Expected output: Chinese with proper separator: 张三 ，李四 ，王五 -->
+    </section>
+    
+    <script type="module">
+        // This would be the actual implementation
+        // For demonstration purposes only
+        console.log('Array iteration example loaded');
+    </script>
+</body>
+</html> 
