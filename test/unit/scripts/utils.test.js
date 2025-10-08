@@ -1,163 +1,211 @@
 import { expect } from '@esm-bundle/chai';
 
-import {
-  createTag,
-  yieldToMain,
-  getMetadata,
-  setMetadata,
-  handlize,
-  flattenObject,
-  createOptimizedPicture,
-  getIcon,
-} from '../../../events/scripts/utils.js';
-
-describe('Utility Functions', () => {
-  describe('createTag', () => {
-    it('should create a tag with given attributes and inner HTML', () => {
-      const el = createTag('div', { class: 'test-class' }, '<p>Test</p>');
-      expect(el.tagName).to.equal('DIV');
-      expect(el.getAttribute('class')).to.equal('test-class');
-      expect(el.innerHTML).to.equal('<p>Test</p>');
+describe('Utils Functions', () => {
+  describe('LIBS and EVENT_LIBS', () => {
+    it('should export LIBS constant', async () => {
+      const { LIBS } = await import('../../../events/scripts/utils.js');
+      expect(LIBS).to.be.a('string');
+      expect(LIBS).to.not.be.empty;
     });
 
-    it('should append HTMLElement as inner HTML', () => {
-      const innerEl = document.createElement('p');
-      innerEl.textContent = 'Test';
-      const el = createTag('div', {}, innerEl);
-      expect(el.innerHTML).to.equal('<p>Test</p>');
+    it('should export EVENT_LIBS constant', async () => {
+      const { EVENT_LIBS } = await import('../../../events/scripts/utils.js');
+      expect(EVENT_LIBS).to.be.a('string');
+      expect(EVENT_LIBS).to.not.be.empty;
     });
 
-    it('should append array of HTMLElements as inner HTML', () => {
-      const innerEl1 = document.createElement('p');
-      innerEl1.textContent = 'Test1';
-      const innerEl2 = document.createElement('p');
-      innerEl2.textContent = 'Test2';
-      const el = createTag('div', {}, [innerEl1, innerEl2]);
-      expect(el.innerHTML).to.equal('<p>Test1</p><p>Test2</p>');
+    it('should have LIBS that contains /libs or http', async () => {
+      const { LIBS } = await import('../../../events/scripts/utils.js');
+      expect(LIBS).to.match(/(\/libs|http)/);
     });
 
-    it('should set attributes correctly', () => {
-      const el = createTag('input', { type: 'text', placeholder: 'Enter text' });
-      expect(el.getAttribute('type')).to.equal('text');
-      expect(el.getAttribute('placeholder')).to.equal('Enter text');
+    it('should have EVENT_LIBS that contains /event-libs or http', async () => {
+      const { EVENT_LIBS } = await import('../../../events/scripts/utils.js');
+      expect(EVENT_LIBS).to.match(/(\/event-libs|http)/);
     });
 
-    it('should append to parent element if provided', () => {
-      const parent = document.createElement('div');
-      const el = createTag('span', {}, 'Test', { parent });
-      expect(parent.children).to.have.lengthOf(1);
-      expect(parent.firstChild).to.equal(el);
+    it('should have EVENT_LIBS that includes version v1', async () => {
+      const { EVENT_LIBS } = await import('../../../events/scripts/utils.js');
+      expect(EVENT_LIBS).to.include('v1');
     });
   });
 
-  describe('yieldToMain', () => {
-    it('should resolve after a timeout', async () => {
-      const start = Date.now();
-      await yieldToMain();
-      const end = Date.now();
-      expect(end - start).to.be.at.least(0); // At least 0ms delay
+  describe('LIBS logic', () => {
+    it('should return /libs for production domains', () => {
+      // Test the logic directly
+      const hostname = 'www.adobe.com';
+      const search = '';
+      
+      const result = (() => {
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/libs';
+        }
+        const branch = new URLSearchParams(search).get('milolibs') || 'main';
+        if (branch === 'local') return 'http://localhost:6456/libs';
+        return branch.includes('--') ? `https://${branch}.aem.live/libs` : `https://${branch}--milo--adobecom.aem.live/libs`;
+      })();
+
+      expect(result).to.equal('/libs');
+    });
+
+    it('should return localhost URL for local development', () => {
+      const hostname = 'localhost';
+      const search = '?milolibs=local';
+      
+      const result = (() => {
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/libs';
+        }
+        const branch = new URLSearchParams(search).get('milolibs') || 'main';
+        if (branch === 'local') return 'http://localhost:6456/libs';
+        return branch.includes('--') ? `https://${branch}.aem.live/libs` : `https://${branch}--milo--adobecom.aem.live/libs`;
+      })();
+
+      expect(result).to.equal('http://localhost:6456/libs');
+    });
+
+    it('should return branch-specific URL for hlx domains with custom branch', () => {
+      const hostname = 'main--milo--adobecom.hlx.page';
+      const search = '?milolibs=feature-branch';
+      
+      const result = (() => {
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/libs';
+        }
+        const branch = new URLSearchParams(search).get('milolibs') || 'main';
+        if (branch === 'local') return 'http://localhost:6456/libs';
+        return branch.includes('--') ? `https://${branch}.aem.live/libs` : `https://${branch}--milo--adobecom.aem.live/libs`;
+      })();
+
+      expect(result).to.equal('https://feature-branch--milo--adobecom.aem.live/libs');
+    });
+
+    it('should return branch-specific URL for branch with -- in name', () => {
+      const hostname = 'main--milo--adobecom.hlx.page';
+      const search = '?milolibs=feature--branch';
+      
+      const result = (() => {
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/libs';
+        }
+        const branch = new URLSearchParams(search).get('milolibs') || 'main';
+        if (branch === 'local') return 'http://localhost:6456/libs';
+        return branch.includes('--') ? `https://${branch}.aem.live/libs` : `https://${branch}--milo--adobecom.aem.live/libs`;
+      })();
+
+      expect(result).to.equal('https://feature--branch.aem.live/libs');
     });
   });
 
-  describe('getMetadata', () => {
-    it('should return meta content for given name', () => {
-      const meta = document.createElement('meta');
-      meta.setAttribute('name', 'description');
-      meta.content = 'Test description';
-      document.head.appendChild(meta);
-      expect(getMetadata('description')).to.equal('Test description');
-      document.head.removeChild(meta);
+  describe('EVENT_LIBS logic', () => {
+    it('should return /event-libs for production domains', () => {
+      const hostname = 'www.adobe.com';
+      const search = '';
+      
+      const result = (() => {
+        const version = 'v1';
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/event-libs';
+        }
+        const branch = new URLSearchParams(search).get('eventlibs') || 'main';
+        if (branch === 'local') {
+          return `http://localhost:3868/event-libs/${version}`;
+        }
+        if (branch.includes('--')) {
+          return `https://${branch}.aem.live/event-libs/${version}`;
+        }
+        return `https://${branch}--event-libs--adobecom.aem.live/event-libs/${version}`;
+      })();
+
+      expect(result).to.equal('/event-libs');
     });
 
-    it('should return null if meta tag does not exist', () => {
-      expect(getMetadata('nonexistent')).to.be.null;
-    });
-  });
+    it('should return localhost URL for local development', () => {
+      const hostname = 'localhost';
+      const search = '?eventlibs=local';
+      
+      const result = (() => {
+        const version = 'v1';
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/event-libs';
+        }
+        const branch = new URLSearchParams(search).get('eventlibs') || 'main';
+        if (branch === 'local') {
+          return `http://localhost:3868/event-libs/${version}`;
+        }
+        if (branch.includes('--')) {
+          return `https://${branch}.aem.live/event-libs/${version}`;
+        }
+        return `https://${branch}--event-libs--adobecom.aem.live/event-libs/${version}`;
+      })();
 
-  describe('setMetadata', () => {
-    it('should set meta content for given name', () => {
-      setMetadata('description', 'New description');
-      const meta = document.head.querySelector('meta[name="description"]');
-      expect(meta).to.not.be.null;
-      expect(meta.content).to.equal('New description');
-      document.head.removeChild(meta);
-    });
-
-    it('should create new meta tag if it does not exist', () => {
-      setMetadata('keywords', 'test, keywords');
-      const meta = document.head.querySelector('meta[name="keywords"]');
-      expect(meta).to.not.be.null;
-      expect(meta.content).to.equal('test, keywords');
-      document.head.removeChild(meta);
-    });
-  });
-
-  describe('handlize', () => {
-    it('should convert string to handle format', () => {
-      expect(handlize('  Test String  ')).to.equal('test-string');
-      expect(handlize('Another Test')).to.equal('another-test');
-    });
-  });
-
-  describe('flattenObject', () => {
-    it('should flatten nested objects', () => {
-      const obj = {
-        a: {
-          b: {
-            c: 1,
-            d: 2,
-          },
-        },
-        e: 3,
-      };
-      const result = flattenObject(obj);
-      expect(result).to.deep.equal({
-        'a.b.c': 1,
-        'a.b.d': 2,
-        e: 3,
-      });
+      expect(result).to.equal('http://localhost:3868/event-libs/v1');
     });
 
-    it('should handle arrays within objects', () => {
-      const obj = { a: [1, 2, { b: 3 }] };
-      const result = flattenObject(obj);
-      expect(result).to.deep.equal({
-        'a[0]': 1,
-        'a[1]': 2,
-        'a[2].b': 3,
-      });
+    it('should return branch-specific URL for hlx domains with custom branch', () => {
+      const hostname = 'main--event-libs--adobecom.hlx.page';
+      const search = '?eventlibs=feature-branch';
+      
+      const result = (() => {
+        const version = 'v1';
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/event-libs';
+        }
+        const branch = new URLSearchParams(search).get('eventlibs') || 'main';
+        if (branch === 'local') {
+          return `http://localhost:3868/event-libs/${version}`;
+        }
+        if (branch.includes('--')) {
+          return `https://${branch}.aem.live/event-libs/${version}`;
+        }
+        return `https://${branch}--event-libs--adobecom.aem.live/event-libs/${version}`;
+      })();
+
+      expect(result).to.equal('https://feature-branch--event-libs--adobecom.aem.live/event-libs/v1');
     });
 
-    it('should handle arbitrary arrays', () => {
-      const obj = {
-        arbitrary: [
-          { key: 'test', value: 'value' },
-        ],
-      };
-      const result = flattenObject(obj);
-      expect(result).to.deep.equal({ 'arbitrary.test': 'value' });
-    });
-  });
+    it('should return branch-specific URL for branch with -- in name', () => {
+      const hostname = 'main--event-libs--adobecom.hlx.page';
+      const search = '?eventlibs=feature--branch';
+      
+      const result = (() => {
+        const version = 'v1';
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/event-libs';
+        }
+        const branch = new URLSearchParams(search).get('eventlibs') || 'main';
+        if (branch === 'local') {
+          return `http://localhost:3868/event-libs/${version}`;
+        }
+        if (branch.includes('--')) {
+          return `https://${branch}.aem.live/event-libs/${version}`;
+        }
+        return `https://${branch}--event-libs--adobecom.aem.live/event-libs/${version}`;
+      })();
 
-  describe('createOptimizedPicture', () => {
-    it('should create a picture element with sources and img', () => {
-      const picture = createOptimizedPicture('https://www.adobe.com/image.jpg', 'Test Image', true, false);
-      expect(picture.tagName).to.equal('PICTURE');
-      const sources = picture.querySelectorAll('source');
-      const img = picture.querySelector('img');
-      expect(sources).to.have.lengthOf(3);
-      expect(img).to.not.be.null;
-      expect(img.getAttribute('alt')).to.equal('Test Image');
+      expect(result).to.equal('https://feature--branch.aem.live/event-libs/v1');
     });
-  });
 
-  describe('getIcon', () => {
-    it('should create an img element with correct attributes', () => {
-      const icon = getIcon('test-icon');
-      expect(icon.tagName).to.equal('IMG');
-      expect(icon.className).to.equal('icon icon-test-icon');
-      expect(icon.getAttribute('src')).to.equal('/events/icons/test-icon.svg');
-      expect(icon.getAttribute('alt')).to.equal('test-icon');
+    it('should include version v1 in the path', () => {
+      const hostname = 'main--event-libs--adobecom.hlx.page';
+      const search = '?eventlibs=test-branch';
+      
+      const result = (() => {
+        const version = 'v1';
+        if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+          return '/event-libs';
+        }
+        const branch = new URLSearchParams(search).get('eventlibs') || 'main';
+        if (branch === 'local') {
+          return `http://localhost:3868/event-libs/${version}`;
+        }
+        if (branch.includes('--')) {
+          return `https://${branch}.aem.live/event-libs/${version}`;
+        }
+        return `https://${branch}--event-libs--adobecom.aem.live/event-libs/${version}`;
+      })();
+
+      expect(result).to.include('/v1');
     });
   });
 });

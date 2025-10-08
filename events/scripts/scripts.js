@@ -291,5 +291,5 @@ async function loadPage() {
 }());
 
 (async function init() {
-  await loadPage()
-})()
+  await loadPage();
+}());
