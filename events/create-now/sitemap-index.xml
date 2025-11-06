@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Default locale -->
   <sitemap>
     <loc>https://www.adobe.com/events/create-now/sitemap.xml</loc>
   </sitemap>
   <sitemap>
     <loc>https://www.adobe.com/events/create-now/events-sitemap.xml</loc>
   </sitemap>
+  
+  <!-- Tier 1 locales -->
   <sitemap>
     <loc>https://www.adobe.com/de/events/create-now/sitemap.xml</loc>
   </sitemap>
@@ -16,24 +19,231 @@
     <loc>https://www.adobe.com/fr/events/create-now/sitemap.xml</loc>
   </sitemap>
   <sitemap>
-    <loc>https://www.adobe.com/fr/events/create-now/events-sitemap.xml</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://www.adobe.com/es/events/create-now/sitemap.xml</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://www.adobe.com/es/events/create-now/events-sitemap.xml</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://www.adobe.com/th_en/events/create-now/sitemap.xml</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://www.adobe.com/th_en/events/create-now/events-sitemap.xml</loc>
+    <loc>https://www.adobe.com/jp/events/create-now/sitemap.xml</loc>
   </sitemap>
   <sitemap>
     <loc>https://www.adobe.com/uk/events/create-now/sitemap.xml</loc>
   </sitemap>
   <sitemap>
     <loc>https://www.adobe.com/uk/events/create-now/events-sitemap.xml</loc>
+  </sitemap>
+  
+  <!-- Tier 2 locales -->
+  <sitemap>
+    <loc>https://www.adobe.com/dk/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/es/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/fi/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/it/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/nl/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/no/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/se/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  
+  <!-- Tier 3 locales -->
+  <sitemap>
+    <loc>https://www.adobe.com/au/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/br/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/cn/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/kr/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/la/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/mx/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/tw/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  
+  <!-- Tier 4 locales -->
+  <sitemap>
+    <loc>https://www.adobe.com/ae_ar/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ae_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/africa/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ar/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/at/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/be_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/be_fr/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/be_nl/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/bg/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ca/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ca_fr/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ch_de/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ch_fr/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ch_it/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/cl/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/co/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/cz/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ee/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/gr_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/hk_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/hk_zh/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/hu/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/id_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/id_id/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ie/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/il_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/il_he/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/in/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/in_hi/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/lt/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/lu_de/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/lu_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/lu_fr/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/lv/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/mena_ar/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/mena_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/my_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/my_ms/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/nz/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/pe/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ph_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ph_fil/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/pl/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/pt/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ro/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ru/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/sa_ar/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/sa_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/sg/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/si/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/sk/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/th_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/th_th/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/tr/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/ua/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/vn_en/events/create-now/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.adobe.com/vn_vi/events/create-now/sitemap.xml</loc>
   </sitemap>
 </sitemapindex>
