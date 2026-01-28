@@ -2,10 +2,11 @@
   "version": "mjdyprbm",
   "releaseTag": "rules-2025.12.20.1766214843475",
   "generated": "2025-12-20T07:14:03.538Z",
-  "lastUpdated": "2026-01-28T20:04:20.098Z",
+  "lastUpdated": "2026-01-28T20:38:43.694Z",
   "lastUpdateReleaseTag": "rules-2025.12.20.1766214843475",
   "installedDomains": [
-    "security-global"
+    "security-global",
+    "security-lang"
   ],
   "files": {
     "security-global/security-global-api.mdc": {
@@ -75,11 +76,15 @@
     "security-global/security-global-xxe-prevention.mdc": {
       "sha256": "602001540bf52109be10a76e9626c98781aa532d3b12896b797258c4b0f49ee4",
       "domain": "security-global"
+    },
+    "security-lang/security-lang-node.mdc": {
+      "sha256": "9019cc2470bbfc6d01c5c34aff42498a91b59ca9766a34a79de1ebe93cc6c587",
+      "domain": "security-lang"
     }
   },
   "stats": {
-    "totalFiles": 17,
+    "totalFiles": 18,
     "missingFiles": 0,
-    "domains": 1
+    "domains": 2
   }
 }
