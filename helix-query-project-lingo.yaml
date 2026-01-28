@@ -414,21 +414,21 @@ indices:
   lingo-mapping-fr:
     include:
       - '/fr/events/**'
-    target: s3://fr/assets/lingo/query-index.json
+    target: /fr/assets/lingo/query-index.json
   lingo-mapping-ca_fr:
     include:
       - '/ca_fr/events/**'
-    target: s3://ca_fr/assets/lingo/query-index.json
+    target: /ca_fr/assets/lingo/query-index.json
   lingo-mapping-be_fr:
     include:
       - '/be_fr/events/**'
-    target: s3://be_fr/assets/lingo/query-index.json
+    target: /be_fr/assets/lingo/query-index.json
   lingo-mapping-ch_fr:
     include:
       - '/ch_fr/events/**'
-    target: s3://ch_fr/assets/lingo/query-index.json
+    target: /ch_fr/assets/lingo/query-index.json
   lingo-mapping-lu_fr:
     include:
       - '/lu_fr/events/**'
-    target: s3://lu_fr/assets/lingo/query-index.json
+    target: /lu_fr/assets/lingo/query-index.json
   
