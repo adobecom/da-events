@@ -37,6 +37,7 @@ const [{
   setMetadata,
   EVENT_BLOCKS,
   processAutoBlockLinks,
+  hydrateBlocks
 }] = await Promise.all([
   import(`${LIBS}/utils/utils.js`),
   import(`${EVENT_LIBS}/libs.js`),
@@ -62,6 +63,7 @@ export default function decorateArea(area = document) {
   }());
 
   processAutoBlockLinks(area);
+  hydrateBlocks(area);
 
   if (!getMetadata('event-id')) return;
   decorateEvent(area);
