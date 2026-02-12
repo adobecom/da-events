@@ -1,9 +1,9 @@
 {
-  "version": "mjdyprbm",
-  "releaseTag": "rules-2025.12.20.1766214843475",
-  "generated": "2025-12-20T07:14:03.538Z",
-  "lastUpdated": "2026-01-28T20:38:43.694Z",
-  "lastUpdateReleaseTag": "rules-2025.12.20.1766214843475",
+  "version": "ml8zf198",
+  "releaseTag": "rules-2026.02.05.1770267256556",
+  "generated": "2026-02-05T04:54:16.604Z",
+  "lastUpdated": "2026-02-12T16:31:29.679Z",
+  "lastUpdateReleaseTag": "rules-2026.02.05.1770267256556",
   "installedDomains": [
     "security-global",
     "security-lang"
@@ -62,7 +62,7 @@
       "domain": "security-global"
     },
     "security-global/security-global-snyk.mdc": {
-      "sha256": "a2bcdb8edff4855335709a93900fc4ec2af015dc774ddaec0d8945b9f207b12e",
+      "sha256": "924cec9c80203e8681704a5174207bab3b6f42a3630708dd7d7fccc4fde5e1b4",
       "domain": "security-global"
     },
     "security-global/security-global-sql-usage.mdc": {
