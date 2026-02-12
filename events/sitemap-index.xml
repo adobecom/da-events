@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Default locale -->
   <sitemap>
     <loc>https://www.adobe.com/events/sitemap.xml</loc>
   </sitemap>
 
-  <!-- Tier 1 locales -->
   <sitemap>
     <loc>https://www.adobe.com/de/events/sitemap.xml</loc>
   </sitemap>
@@ -19,7 +17,6 @@
     <loc>https://www.adobe.com/uk/events/sitemap.xml</loc>
   </sitemap>
 
-  <!-- Tier 2 locales -->
   <sitemap>
     <loc>https://www.adobe.com/dk/events/sitemap.xml</loc>
   </sitemap>
@@ -42,7 +39,6 @@
     <loc>https://www.adobe.com/se/events/sitemap.xml</loc>
   </sitemap>
 
-  <!-- Tier 3 locales -->
   <sitemap>
     <loc>https://www.adobe.com/au/events/sitemap.xml</loc>
   </sitemap>
@@ -65,7 +61,6 @@
     <loc>https://www.adobe.com/tw/events/sitemap.xml</loc>
   </sitemap>
 
-  <!-- Tier 4 locales -->
   <sitemap>
     <loc>https://www.adobe.com/ae_ar/events/sitemap.xml</loc>
   </sitemap>
