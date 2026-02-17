@@ -28,13 +28,9 @@ const [{
   getConfig,
 }, {
   setEventConfig,
-  getEventConfig,
   decorateEvent,
-  getNonProdData,
-  validatePageAndRedirect,
   getSusiOptions,
   getMetadata,
-  setMetadata,
   EVENT_BLOCKS,
   processAutoBlockLinks,
 }] = await Promise.all([
@@ -65,36 +61,6 @@ export default function decorateArea(area = document) {
 
   if (!getMetadata('event-id')) return;
   decorateEvent(area);
-}
-
-function renderWithNonProdMetadata() {
-  const isEventDetailsPage = getMetadata('event-id');
-
-  if (!isEventDetailsPage) return false;
-
-  const isLiveProd = getEventConfig().eventServiceEnv.name === 'prod' && window.location.hostname === 'www.adobe.com';
-  const isMissingEventId = !getMetadata('event-id');
-
-  if (!isLiveProd && isMissingEventId) return true;
-
-  const isPreviewMode = new URLSearchParams(window.location.search).get('previewMode');
-
-  if (isLiveProd && isPreviewMode) return true;
-
-  return false;
-}
-
-async function fetchAndDecorateArea() {
-  // Load non-prod data for stage and dev environments
-  let env = getEventConfig().eventServiceEnv.name;
-  if (env === 'local') env = 'dev';
-  const nonProdData = await getNonProdData(env);
-  if (!nonProdData) return;
-  Object.entries(nonProdData).forEach(([key, value]) => {
-    setMetadata(key, value);
-  });
-
-  decorateArea();
 }
 
 function replaceDotMedia(area = document) {
@@ -247,19 +213,13 @@ const CONFIG = {
 };
 
 const MILO_CONFIG = setConfig({ ...CONFIG });
-const EVENT_CONFIG = setEventConfig(E_CONFIG, MILO_CONFIG);
+setEventConfig(E_CONFIG, MILO_CONFIG);
 
 replaceDotMedia(document);
 
 // Decorate the page with site specific needs.
 
 decorateArea();
-
-// SP projects legacy support
-if (EVENT_CONFIG.cmsType === 'SP') {
-  if (renderWithNonProdMetadata()) await fetchAndDecorateArea();
-  if (getMetadata('event-details-page') === 'yes') await validatePageAndRedirect(LIBS);
-}
 
 /*
  * ------------------------------------------------------------
