@@ -1,6 +1,6 @@
 export const LIBS = (() => {
   const { hostname, search } = window.location;
-  if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) return '/libs';
+  if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local') || hostname.includes('da.live'))) return '/libs';
   const branch = new URLSearchParams(search).get('milolibs') || 'main';
   if (branch === 'local') return 'http://localhost:6456/libs';
   return branch.includes('--') ? `https://${branch}.aem.live/libs` : `https://${branch}--milo--adobecom.aem.live/libs`;
@@ -10,7 +10,7 @@ export const EVENT_LIBS = (() => {
   const version = 'v1';
   const { hostname, search } = window.location;
 
-  if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local'))) {
+  if (!(hostname.includes('.hlx.') || hostname.includes('.aem.') || hostname.includes('local') || hostname.includes('da.live'))) {
     return `/event-libs/${version}`;
   }
 
