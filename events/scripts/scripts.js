@@ -28,13 +28,9 @@ const [{
   getConfig,
 }, {
   setEventConfig,
-  getEventConfig,
   decorateEvent,
-  getNonProdData,
-  validatePageAndRedirect,
   getSusiOptions,
   getMetadata,
-  setMetadata,
   EVENT_BLOCKS,
   processAutoBlockLinks,
 }] = await Promise.all([
@@ -65,36 +61,6 @@ export default function decorateArea(area = document) {
 
   if (!getMetadata('event-id')) return;
   decorateEvent(area);
-}
-
-function renderWithNonProdMetadata() {
-  const isEventDetailsPage = getMetadata('event-id');
-
-  if (!isEventDetailsPage) return false;
-
-  const isLiveProd = getEventConfig().eventServiceEnv.name === 'prod' && window.location.hostname === 'www.adobe.com';
-  const isMissingEventId = !getMetadata('event-id');
-
-  if (!isLiveProd && isMissingEventId) return true;
-
-  const isPreviewMode = new URLSearchParams(window.location.search).get('previewMode');
-
-  if (isLiveProd && isPreviewMode) return true;
-
-  return false;
-}
-
-async function fetchAndDecorateArea() {
-  // Load non-prod data for stage and dev environments
-  let env = getEventConfig().eventServiceEnv.name;
-  if (env === 'local') env = 'dev';
-  const nonProdData = await getNonProdData(env);
-  if (!nonProdData) return;
-  Object.entries(nonProdData).forEach(([key, value]) => {
-    setMetadata(key, value);
-  });
-
-  decorateArea();
 }
 
 function replaceDotMedia(area = document) {
@@ -147,14 +113,14 @@ const CONFIG = {
     at: { ietf: 'de-AT', tk: 'hah7vzn.css' },
     au: { ietf: 'en-AU', tk: 'hah7vzn.css' },
     be_en: { ietf: 'en-BE', tk: 'hah7vzn.css' },
-    be_fr: { ietf: 'fr-BE', tk: 'hah7vzn.css', base: 'fr' },
+    be_fr: { ietf: 'fr-BE', tk: 'hah7vzn.css', exl: 'fr', base: 'fr' },
     be_nl: { ietf: 'nl-BE', tk: 'qxw8hzm.css' },
     bg: { ietf: 'bg-BG', tk: 'qxw8hzm.css' },
     br: { ietf: 'pt-BR', tk: 'hah7vzn.css' },
-    ca_fr: { ietf: 'fr-CA', tk: 'hah7vzn.css', base: 'fr' },
+    ca_fr: { ietf: 'fr-CA', tk: 'hah7vzn.css', exl: 'fr', base: 'fr' },
     ca: { ietf: 'en-CA', tk: 'hah7vzn.css' },
     ch_de: { ietf: 'de-CH', tk: 'hah7vzn.css' },
-    ch_fr: { ietf: 'fr-CH', tk: 'hah7vzn.css', base: 'fr' },
+    ch_fr: { ietf: 'fr-CH', tk: 'hah7vzn.css', exl: 'fr', base: 'fr' },
     ch_it: { ietf: 'it-CH', tk: 'hah7vzn.css' },
     cl: { ietf: 'es-CL', tk: 'hah7vzn.css' },
     cn: { ietf: 'zh-CN', tk: 'qxw8hzm' },
@@ -171,7 +137,7 @@ const CONFIG = {
     el: { ietf: 'el', tk: 'qxw8hzm.css' },
     es: { ietf: 'es-ES', tk: 'hah7vzn.css' },
     fi: { ietf: 'fi-FI', tk: 'qxw8hzm.css' },
-    fr: { ietf: 'fr-FR', tk: 'hah7vzn.css' },
+    fr: { ietf: 'fr-FR', tk: 'hah7vzn.css', exl: 'fr' },
     gr_el: { ietf: 'el', tk: 'qxw8hzm.css' },
     gr_en: { ietf: 'en-GR', tk: 'hah7vzn.css' },
     gt: { ietf: 'es-419', tk: 'hah7vzn.css' },
@@ -195,7 +161,7 @@ const CONFIG = {
     lt: { ietf: 'lt-LT', tk: 'qxw8hzm.css' },
     lu_de: { ietf: 'de-LU', tk: 'hah7vzn.css' },
     lu_en: { ietf: 'en-LU', tk: 'hah7vzn.css' },
-    lu_fr: { ietf: 'fr-LU', tk: 'hah7vzn.css', base: 'fr' },
+    lu_fr: { ietf: 'fr-LU', tk: 'hah7vzn.css', exl: 'fr', base: 'fr' },
     lv: { ietf: 'lv-LV', tk: 'qxw8hzm.css' },
     mena_ar: { ietf: 'ar', tk: 'qxw8hzm.css', dir: 'rtl' },
     mena_en: { ietf: 'en', tk: 'hah7vzn.css' },
@@ -253,19 +219,13 @@ const CONFIG = {
 };
 
 const MILO_CONFIG = setConfig({ ...CONFIG });
-const EVENT_CONFIG = setEventConfig(E_CONFIG, MILO_CONFIG);
+setEventConfig(E_CONFIG, MILO_CONFIG);
 
 replaceDotMedia(document);
 
 // Decorate the page with site specific needs.
 
 decorateArea();
-
-// SP projects legacy support
-if (EVENT_CONFIG.cmsType === 'SP') {
-  if (renderWithNonProdMetadata()) await fetchAndDecorateArea();
-  if (getMetadata('event-details-page') === 'yes') await validatePageAndRedirect(LIBS);
-}
 
 /*
  * ------------------------------------------------------------
@@ -294,7 +254,10 @@ async function loadPage() {
 (async function loadDa() {
   if (!new URL(window.location.href).searchParams.get('dapreview')) return;
   // eslint-disable-next-line import/no-unresolved
-  import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(loadPage));
+  import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(async () => {
+    processAutoBlockLinks(document);
+    await loadPage();
+  }));
 }());
 
 (async function init() {
