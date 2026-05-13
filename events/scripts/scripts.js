@@ -205,7 +205,7 @@ const CONFIG = {
     enableGuestBotDetection: false,
     api_parameters: { check_token: { guest_allowed: true } },
     onTokenExpired: () => {
-      window.locaton.reload();
+      window.location.reload();
     },
   },
   signInContext: getSusiOptions(),
