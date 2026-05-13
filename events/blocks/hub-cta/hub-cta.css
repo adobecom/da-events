@@ -1,0 +1,121 @@
+/* ─── Hub CTA Block ───────────────────────────────────────────────────────── */
+
+:root {
+  --hub-cta-bg: #eb1000;
+  --hub-cta-text: #ffffff;
+  --hub-cta-btn-bg: #ffffff;
+  --hub-cta-btn-text: #eb1000;
+  --hub-cta-btn-hover-bg: #f5f5f5;
+  --hub-cta-ghost-border: rgba(255, 255, 255, 0.6);
+}
+
+.hub-cta {
+  background: var(--hub-cta-bg);
+  color: var(--hub-cta-text);
+  padding: 72px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hub-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hub-cta > div {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.hub-cta p:first-child {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.hub-cta h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--hub-cta-text);
+  margin: 0;
+}
+
+.hub-cta p:not(:first-child):not(:last-child) {
+  font-size: 1.0625rem;
+  opacity: 0.88;
+  max-width: 48ch;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Button row ── */
+.hub-cta .hub-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.hub-cta .hub-cta-actions a {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 30px;
+  border-radius: 4px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.hub-cta .hub-cta-actions a:first-child {
+  background: var(--hub-cta-btn-bg);
+  color: var(--hub-cta-btn-text);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.hub-cta .hub-cta-actions a:first-child:hover {
+  background: var(--hub-cta-btn-hover-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
+}
+
+.hub-cta .hub-cta-actions a:last-child {
+  background: transparent;
+  color: var(--hub-cta-text);
+  border: 1.5px solid var(--hub-cta-ghost-border);
+}
+
+.hub-cta .hub-cta-actions a:last-child:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: white;
+}
+
+@media (max-width: 600px) {
+  .hub-cta {
+    padding: 56px 20px;
+  }
+
+  .hub-cta .hub-cta-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hub-cta .hub-cta-actions a {
+    justify-content: center;
+  }
+}

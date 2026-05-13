@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/cod87753/Code/ai-council/packages/cli/dist/hooks/claude-code-post-tool.cjs\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/cod87753/Code/ai-council/packages/cli/dist/hooks/claude-code-pre-tool.cjs\""
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "pim": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pim/mcp-server@0.1.0"
+      ],
+      "env": {
+        "PIM_API_URL": "https://d1ygncl0yqo6sv.cloudfront.net"
+      }
+    }
+  }
+}
