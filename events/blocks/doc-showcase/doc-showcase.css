@@ -1,0 +1,302 @@
+/* ─────────────────────────────────────────────
+   doc-showcase block
+   A fan/mosaic showcase of document-preview cards
+   ───────────────────────────────────────────── */
+
+/* ── CSS custom properties ── */
+.doc-showcase {
+  --doc-showcase-bg: #fff;
+  --doc-showcase-text: #2c2c2c;
+  --doc-showcase-muted: #6e6e6e;
+  --doc-showcase-accent: #eb1000;
+  --doc-showcase-link: #0265dc;
+
+  /* Card palette — mirrors Figma document types */
+  --doc-showcase-card-1-bg: #f0f0f2;      /* invoice / light */
+  --doc-showcase-card-1-text: #2c2c2c;
+  --doc-showcase-card-2-bg: #1a1a2e;      /* white paper / dark */
+  --doc-showcase-card-2-text: #fff;
+  --doc-showcase-card-3-bg: #d9d9e8;      /* research report / lavender */
+  --doc-showcase-card-3-text: #2c2c3c;
+  --doc-showcase-card-4-bg: #aadde8;      /* media mix / teal */
+  --doc-showcase-card-4-text: #1a3545;
+  --doc-showcase-card-5-bg: #6b5e18;      /* growth report / gold */
+  --doc-showcase-card-5-text: #fff;
+
+  background: var(--doc-showcase-bg);
+  padding: 80px 48px;
+}
+
+/* ── Inner container ── */
+.doc-showcase > div,
+.doc-showcase-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Optional intro ── */
+.doc-showcase-intro {
+  margin-bottom: 56px;
+}
+
+.doc-showcase-intro-content {
+  max-width: 640px;
+}
+
+.doc-showcase-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--doc-showcase-accent);
+  margin: 0 0 12px;
+}
+
+.doc-showcase-intro h2,
+.doc-showcase-intro h3 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: var(--doc-showcase-text);
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.doc-showcase-intro p {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--doc-showcase-muted);
+  margin: 0 0 8px;
+}
+
+/* Intro CTAs */
+.doc-showcase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.doc-showcase-actions strong a {
+  display: inline-block;
+  padding: 13px 28px;
+  border-radius: 4px;
+  background: var(--doc-showcase-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.doc-showcase-actions em a {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 4px;
+  border: 2px solid var(--doc-showcase-link);
+  color: var(--doc-showcase-link);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+/* ── Mosaic grid ── */
+.doc-showcase-mosaic {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 24px 0 48px;
+}
+
+/* ── Cards — base ── */
+.doc-showcase-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease;
+  position: relative;
+}
+
+.doc-showcase-card:hover {
+  transform: translateY(-8px) rotate(0deg) !important;
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* ── Per-card color palettes ── */
+.doc-showcase-card--1 {
+  background: var(--doc-showcase-card-1-bg);
+  color: var(--doc-showcase-card-1-text);
+  transform: rotate(-4deg) translateY(24px);
+  z-index: 1;
+}
+
+.doc-showcase-card--2 {
+  background: var(--doc-showcase-card-2-bg);
+  color: var(--doc-showcase-card-2-text);
+  transform: rotate(2.5deg) translateY(-12px);
+  z-index: 2;
+}
+
+.doc-showcase-card--3 {
+  background: var(--doc-showcase-card-3-bg);
+  color: var(--doc-showcase-card-3-text);
+  transform: rotate(-2deg) translateY(20px);
+  z-index: 1;
+}
+
+.doc-showcase-card--4 {
+  background: var(--doc-showcase-card-4-bg);
+  color: var(--doc-showcase-card-4-text);
+  transform: rotate(3deg) translateY(4px);
+  z-index: 2;
+}
+
+.doc-showcase-card--5 {
+  background: var(--doc-showcase-card-5-bg);
+  color: var(--doc-showcase-card-5-text);
+  transform: rotate(-1.5deg) translateY(16px);
+  z-index: 1;
+}
+
+/* ── Card visual (image or decorative fill) ── */
+.doc-showcase-card-visual {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.doc-showcase-card-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Card text content ── */
+.doc-showcase-card-content {
+  padding: 20px 24px 28px;
+}
+
+.doc-showcase-card-tag {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  opacity: 0.75;
+}
+
+/* Tag accent color adapts to card background */
+.doc-showcase-card--1 .doc-showcase-card-tag { color: var(--doc-showcase-accent); opacity: 1; }
+.doc-showcase-card--2 .doc-showcase-card-tag { color: rgba(255, 255, 255, 0.7); }
+.doc-showcase-card--3 .doc-showcase-card-tag { color: #5050a0; opacity: 1; }
+.doc-showcase-card--4 .doc-showcase-card-tag { color: #1a3545; opacity: 0.8; }
+.doc-showcase-card--5 .doc-showcase-card-tag { color: rgba(255, 255, 255, 0.7); }
+
+.doc-showcase-card-content h2,
+.doc-showcase-card-content h3,
+.doc-showcase-card-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.doc-showcase-card-content p {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  margin: 0 0 8px;
+  opacity: 0.85;
+}
+
+.doc-showcase-card-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Card CTAs */
+.doc-showcase-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.doc-showcase-card-actions a {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1.5px solid currentcolor;
+  transition: opacity 0.2s ease;
+}
+
+.doc-showcase-card-actions a:hover {
+  opacity: 0.75;
+}
+
+.doc-showcase-card--1 .doc-showcase-card-actions a { color: var(--doc-showcase-link); }
+.doc-showcase-card--2 .doc-showcase-card-actions a { color: rgba(255, 255, 255, 0.85); }
+.doc-showcase-card--3 .doc-showcase-card-actions a { color: #5050a0; }
+.doc-showcase-card--4 .doc-showcase-card-actions a { color: #1a3545; }
+.doc-showcase-card--5 .doc-showcase-card-actions a { color: rgba(255, 255, 255, 0.85); }
+
+/* ── Dark block variant ── */
+.doc-showcase.dark {
+  --doc-showcase-bg: #141414;
+  --doc-showcase-text: #fff;
+  --doc-showcase-muted: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Responsive — tablet (≤ 1024px) ── */
+@media (max-width: 1024px) {
+  .doc-showcase-mosaic {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  /* Re-balance rotation on 2-col layout */
+  .doc-showcase-card--1 { transform: rotate(-3deg) translateY(16px); }
+  .doc-showcase-card--2 { transform: rotate(2deg) translateY(-8px); }
+  .doc-showcase-card--3 { transform: rotate(-2deg) translateY(20px); }
+  .doc-showcase-card--4 { transform: rotate(2.5deg) translateY(0); }
+  .doc-showcase-card--5 { transform: rotate(-1deg) translateY(12px); }
+}
+
+/* ── Responsive — large tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+  .doc-showcase {
+    padding: 60px 32px;
+  }
+}
+
+/* ── Responsive — mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .doc-showcase {
+    padding: 48px 20px;
+  }
+
+  .doc-showcase-mosaic {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-bottom: 32px;
+  }
+
+  /* Remove rotation on mobile for legibility */
+  .doc-showcase-card--1,
+  .doc-showcase-card--2,
+  .doc-showcase-card--3,
+  .doc-showcase-card--4,
+  .doc-showcase-card--5 {
+    transform: none;
+  }
+
+  .doc-showcase-actions {
+    flex-direction: column;
+  }
+}

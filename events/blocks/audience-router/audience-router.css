@@ -1,0 +1,286 @@
+/* ── Block wrapper ── */
+.audience-router {
+  --audience-router-bg: #ffffff;
+  --audience-router-card-bg: #f5f5f5;
+  --audience-router-text: #2c2c2c;
+  --audience-router-label-color: #2c2c2c;
+  --audience-router-tagline-color: #2c2c2c;
+  --audience-router-dot-color: #d0d0d0;
+  --audience-router-dot-active: #2c2c2c;
+  --audience-router-card-radius: 16px;
+  --audience-router-tab-radius: 8px;
+
+  background: var(--audience-router-bg);
+  padding: 80px 48px;
+  overflow: hidden;
+}
+
+/* ── Inner container ── */
+.audience-router > div {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Heading section ── */
+.audience-router-heading {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.audience-router-heading h2,
+.audience-router-heading h3 {
+  font-size: clamp(1.75rem, 3.5vw, 3.5rem);
+  font-weight: 900;
+  color: var(--audience-router-text);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0 auto;
+  max-width: 720px;
+}
+
+.audience-router-heading p {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--audience-router-text);
+  margin: 16px auto 0;
+  max-width: 640px;
+}
+
+/* ── Cards grid ── */
+.audience-router-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* ── Individual card ── */
+.audience-router-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--audience-router-card-bg);
+  border-radius: var(--audience-router-card-radius);
+  overflow: hidden;
+  cursor: default;
+  transition: box-shadow 0.2s ease;
+}
+
+.audience-router-card[role='link'] {
+  cursor: pointer;
+}
+
+.audience-router-card[role='link']:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.audience-router-card[role='link']:focus-visible {
+  outline: 2px solid #0265dc;
+  outline-offset: 2px;
+}
+
+/* ── Tab header ── */
+.audience-router-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  cursor: pointer;
+  border-radius: var(--audience-router-tab-radius);
+  transition: background 0.15s ease;
+  user-select: none;
+}
+
+.audience-router-tab:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ── Audience label ── */
+.audience-router-label {
+  font-size: 1.125rem;
+  font-weight: 900;
+  color: var(--audience-router-label-color);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* ── Chevron icon ── */
+.audience-router-chevron {
+  display: inline-block;
+  width: 6px;
+  height: 10px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.audience-router-chevron::before,
+.audience-router-chevron::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: 1.5px;
+  height: 6px;
+  background: var(--audience-router-label-color);
+  border-radius: 2px;
+}
+
+.audience-router-chevron::before {
+  top: 0;
+  transform: rotate(45deg);
+  transform-origin: right bottom;
+}
+
+.audience-router-chevron::after {
+  bottom: 0;
+  transform: rotate(-45deg);
+  transform-origin: right top;
+}
+
+/* ── Media (product image) ── */
+.audience-router-media {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 200px;
+}
+
+.audience-router-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Tagline ── */
+.audience-router-tagline {
+  padding: 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--audience-router-tagline-color);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.audience-router-tagline p {
+  margin: 0;
+}
+
+.audience-router-tagline a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── Active card highlight ── */
+.audience-router-card.active .audience-router-tab {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Progress dots ── */
+.audience-router-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.audience-router-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: var(--audience-router-dot-color);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.audience-router-dot.active {
+  background: var(--audience-router-dot-active);
+  transform: scale(1.25);
+}
+
+.audience-router-dot:hover {
+  background: #888;
+}
+
+/* ── Dark variant ── */
+.audience-router.dark {
+  --audience-router-bg: #141414;
+  --audience-router-card-bg: #1e1e1e;
+  --audience-router-text: #ffffff;
+  --audience-router-label-color: #ffffff;
+  --audience-router-tagline-color: #ffffff;
+  --audience-router-dot-color: #555;
+  --audience-router-dot-active: #ffffff;
+}
+
+.audience-router.dark .audience-router-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.audience-router.dark .audience-router-card.active .audience-router-tab {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.audience-router.dark .audience-router-chevron::before,
+.audience-router.dark .audience-router-chevron::after {
+  background: #ffffff;
+}
+
+/* ── Responsive: tablet (≤1200px) — 2 columns ── */
+@media (max-width: 1200px) {
+  .audience-router {
+    padding: 64px 32px;
+  }
+
+  .audience-router-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* ── Responsive: mobile (≤768px) — horizontal scroll ── */
+@media (max-width: 768px) {
+  .audience-router {
+    padding: 48px 0;
+  }
+
+  .audience-router-heading {
+    padding: 0 20px;
+    margin-bottom: 32px;
+  }
+
+  .audience-router-cards {
+    grid-template-columns: repeat(4, 280px);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 20px;
+    gap: 8px;
+    /* hide scrollbar */
+    scrollbar-width: none;
+  }
+
+  .audience-router-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .audience-router-card {
+    scroll-snap-align: start;
+  }
+
+  .audience-router-progress {
+    margin-top: 24px;
+  }
+}
+
+/* ── Responsive: small mobile (≤480px) ── */
+@media (max-width: 480px) {
+  .audience-router-cards {
+    grid-template-columns: repeat(4, 260px);
+  }
+
+  .audience-router-heading h2,
+  .audience-router-heading h3 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+}

@@ -1,0 +1,322 @@
+/* ─────────────────────────────────────────────
+   Feature Demo block
+   ─────────────────────────────────────────────
+   Showcases document-creation capabilities with
+   a card grid and an interactive product-demo
+   preview. Supports a "dark" variant.
+   ───────────────────────────────────────────── */
+
+/* ── Block wrapper ── */
+.feature-demo {
+  --feature-demo-bg: #ffffff;
+  --feature-demo-text: #2c2c2c;
+  --feature-demo-muted: #6e6e6e;
+  --feature-demo-accent: #eb1000;
+  --feature-demo-link: #0265dc;
+  --feature-demo-divider: #e8e8e8;
+  --feature-demo-card-bg: #f5f5f5;
+  --feature-demo-card-radius: 8px;
+  --feature-demo-media-radius: 12px;
+  --feature-demo-shadow: 0 16px 48px rgba(0, 0, 0, 0.10);
+
+  background: var(--feature-demo-bg);
+  padding: 80px 48px;
+  overflow: hidden;
+}
+
+/* ── Max-width inner container per section row ── */
+.feature-demo > div {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Section rows ── */
+.feature-demo-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  padding: 64px 0;
+  border-top: 1px solid var(--feature-demo-divider);
+}
+
+.feature-demo-section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.feature-demo-section:last-child {
+  padding-bottom: 0;
+}
+
+/* ── Single-cell full-width section ── */
+.feature-demo-single {
+  grid-template-columns: 1fr;
+}
+
+.feature-demo-full {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* ─────────────────────────────────
+   Eyebrow
+   ───────────────────────────────── */
+.feature-demo-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--feature-demo-accent);
+  margin: 0 0 12px;
+}
+
+/* ─────────────────────────────────
+   Text content cell
+   ───────────────────────────────── */
+.feature-demo-content h2,
+.feature-demo-content h3,
+.feature-demo-full h2,
+.feature-demo-full h3 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: var(--feature-demo-text);
+  margin: 0 0 20px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.feature-demo-content p,
+.feature-demo-full p {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--feature-demo-muted);
+  margin: 0 0 16px;
+}
+
+.feature-demo-content p:last-child,
+.feature-demo-full p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─────────────────────────────────
+   CTA actions container
+   ───────────────────────────────── */
+.feature-demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.feature-demo-full .feature-demo-actions {
+  justify-content: center;
+}
+
+.feature-demo-actions p {
+  margin: 0;
+}
+
+/* Primary CTA: wrapped in <strong> by the author */
+.feature-demo-actions strong a {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 28px;
+  border-radius: 100px;
+  background: var(--feature-demo-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-demo-actions strong a:hover {
+  background: #c50000;
+  box-shadow: 0 4px 16px rgba(235, 16, 0, 0.32);
+}
+
+.feature-demo-actions strong a:focus-visible {
+  outline: 2px solid var(--feature-demo-accent);
+  outline-offset: 3px;
+}
+
+/* Secondary / inline link CTA */
+.feature-demo-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--feature-demo-link);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: opacity 0.15s ease;
+}
+
+.feature-demo-actions a:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
+.feature-demo-actions a:focus-visible {
+  outline: 2px solid var(--feature-demo-link);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ─────────────────────────────────
+   Card grid cell
+   ───────────────────────────────── */
+.feature-demo-grid {
+  position: relative;
+}
+
+.feature-demo-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+/* Individual document card */
+.feature-demo-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--feature-demo-card-radius);
+  overflow: hidden;
+  background: var(--feature-demo-card-bg);
+  border: 1px solid var(--feature-demo-divider);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.feature-demo-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Card thumbnail */
+.feature-demo-card > p:first-child {
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.feature-demo-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+/* Card filename label */
+.feature-demo-card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--feature-demo-text);
+  padding: 8px 10px 10px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-top: 1px solid var(--feature-demo-divider);
+  background: var(--feature-demo-card-bg);
+}
+
+/* ─────────────────────────────────
+   Media / product screenshot cell
+   ───────────────────────────────── */
+.feature-demo-media {
+  position: relative;
+}
+
+.feature-demo-media p {
+  margin: 0;
+}
+
+.feature-demo-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--feature-demo-media-radius);
+  box-shadow: var(--feature-demo-shadow);
+}
+
+/* ─────────────────────────────────
+   Dark variant
+   ───────────────────────────────── */
+.feature-demo.dark {
+  --feature-demo-bg: #141414;
+  --feature-demo-text: #ffffff;
+  --feature-demo-muted: #ababab;
+  --feature-demo-divider: #333333;
+  --feature-demo-card-bg: #1e1e1e;
+  --feature-demo-shadow: 0 16px 48px rgba(0, 0, 0, 0.40);
+}
+
+.feature-demo.dark .feature-demo-actions strong a {
+  background: #ffffff;
+  color: #141414;
+}
+
+.feature-demo.dark .feature-demo-actions strong a:hover {
+  background: #e8e8e8;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
+}
+
+.feature-demo.dark .feature-demo-actions a {
+  color: #4ca3ff;
+}
+
+/* ─────────────────────────────────
+   Responsive — tablet (≤ 900px)
+   ───────────────────────────────── */
+@media (max-width: 900px) {
+  .feature-demo {
+    padding: 60px 32px;
+  }
+
+  .feature-demo-section {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 48px 0;
+  }
+
+  /* On small screens show the grid before the copy */
+  .feature-demo-grid {
+    order: -1;
+  }
+
+  .feature-demo-card-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+}
+
+/* ─────────────────────────────────
+   Responsive — mobile (≤ 600px)
+   ───────────────────────────────── */
+@media (max-width: 600px) {
+  .feature-demo-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* ─────────────────────────────────
+   Responsive — small mobile (≤ 480px)
+   ───────────────────────────────── */
+@media (max-width: 480px) {
+  .feature-demo {
+    padding: 48px 20px;
+  }
+
+  .feature-demo-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .feature-demo-full .feature-demo-actions {
+    align-items: center;
+  }
+}

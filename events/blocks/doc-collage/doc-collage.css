@@ -1,0 +1,268 @@
+/* ── Block wrapper ── */
+.doc-collage {
+  --doc-collage-bg: #f5f5f5;
+  --doc-collage-text: #2c2c2c;
+  --doc-collage-muted: #6e6e6e;
+  --doc-collage-accent: #eb1000;
+  --doc-collage-link: #0265dc;
+  --doc-collage-card-bg: #fff;
+  --doc-collage-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --doc-collage-card-radius: 14px;
+
+  background: var(--doc-collage-bg);
+  padding: 80px 48px;
+  overflow: hidden;
+}
+
+/* ── Optional section header ── */
+.doc-collage-header-wrap {
+  max-width: 1280px;
+  margin: 0 auto 64px;
+  text-align: center;
+}
+
+.doc-collage-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.doc-collage-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--doc-collage-muted);
+  margin: 0;
+}
+
+.doc-collage-header h2,
+.doc-collage-header h3 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: var(--doc-collage-text);
+  line-height: 1.15;
+  margin: 0;
+  max-width: 22ch;
+}
+
+.doc-collage-header p {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--doc-collage-muted);
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* ── CTA actions ── */
+.doc-collage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.doc-collage-actions p {
+  margin: 0;
+}
+
+.doc-collage-actions strong a {
+  display: inline-block;
+  padding: 13px 28px;
+  border-radius: 4px;
+  background: var(--doc-collage-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.doc-collage-actions em a {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 4px;
+  border: 2px solid var(--doc-collage-link);
+  color: var(--doc-collage-link);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.doc-collage-actions a {
+  color: var(--doc-collage-link);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.doc-collage-actions a:hover {
+  text-decoration: underline;
+}
+
+/* ── Collage stage ── */
+.doc-collage-stage {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Collage container: fan/scatter layout ── */
+.doc-collage-collage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 40px 20px;
+  position: relative;
+}
+
+/* ── Individual document card ── */
+.doc-collage-card {
+  position: relative;
+  flex-shrink: 0;
+  width: clamp(180px, 18vw, 260px);
+  background: var(--doc-collage-card-bg);
+  border-radius: var(--doc-collage-card-radius);
+  box-shadow: var(--doc-collage-card-shadow);
+  overflow: hidden;
+  margin: -16px 8px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  z-index: 2;
+}
+
+.doc-collage-card:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+  z-index: 10;
+}
+
+/* Scatter rotations via nth-child — creates the collage effect */
+.doc-collage-card:nth-child(5n + 1) {
+  transform: rotate(-3.2deg) translateY(-8px);
+}
+
+.doc-collage-card:nth-child(5n + 2) {
+  transform: rotate(2.4deg) translateY(12px);
+  z-index: 3;
+}
+
+.doc-collage-card:nth-child(5n + 3) {
+  transform: rotate(-1.6deg) translateY(-4px);
+  z-index: 4;
+}
+
+.doc-collage-card:nth-child(5n + 4) {
+  transform: rotate(3.8deg) translateY(6px);
+  z-index: 3;
+}
+
+.doc-collage-card:nth-child(5n + 5) {
+  transform: rotate(-2.8deg) translateY(-10px);
+}
+
+/* Keep hover state transform clean */
+.doc-collage-card:nth-child(5n + 1):hover { transform: rotate(-3.2deg) translateY(-14px) scale(1.03); }
+.doc-collage-card:nth-child(5n + 2):hover { transform: rotate(2.4deg) translateY(6px) scale(1.03); }
+.doc-collage-card:nth-child(5n + 3):hover { transform: rotate(-1.6deg) translateY(-10px) scale(1.03); }
+.doc-collage-card:nth-child(5n + 4):hover { transform: rotate(3.8deg) translateY(0px) scale(1.03); }
+.doc-collage-card:nth-child(5n + 5):hover { transform: rotate(-2.8deg) translateY(-16px) scale(1.03); }
+
+/* ── Card media ── */
+.doc-collage-card-media {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+
+.doc-collage-card-media p {
+  margin: 0;
+  height: 100%;
+}
+
+.doc-collage-card-media picture,
+.doc-collage-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Card caption (optional) ── */
+.doc-collage-card-caption {
+  padding: 12px 14px;
+}
+
+.doc-collage-card-caption p {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--doc-collage-muted);
+  margin: 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Dark variant ── */
+.doc-collage.dark {
+  --doc-collage-bg: #141414;
+  --doc-collage-text: #fff;
+  --doc-collage-muted: #b0b0b0;
+  --doc-collage-card-bg: #222;
+  --doc-collage-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.48);
+  --doc-collage-link: #5ba4ff;
+}
+
+/* ── Responsive: tablet ── */
+@media (max-width: 900px) {
+  .doc-collage {
+    padding: 60px 32px;
+  }
+
+  .doc-collage-header-wrap {
+    margin-bottom: 48px;
+  }
+
+  .doc-collage-card {
+    width: clamp(140px, 22vw, 200px);
+    margin: -12px 6px;
+  }
+
+  .doc-collage-collage {
+    padding: 24px 10px;
+  }
+}
+
+/* ── Responsive: mobile — collapse to grid ── */
+@media (max-width: 480px) {
+  .doc-collage {
+    padding: 48px 20px;
+  }
+
+  .doc-collage-header-wrap {
+    margin-bottom: 36px;
+  }
+
+  /* Reset scatter effect on mobile; show a simple 2-up grid */
+  .doc-collage-collage {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0;
+  }
+
+  .doc-collage-card {
+    width: 100%;
+    margin: 0;
+    transform: none !important;
+  }
+
+  .doc-collage-card:hover {
+    transform: none !important;
+  }
+
+  .doc-collage-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}
