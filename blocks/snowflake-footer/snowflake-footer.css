@@ -1,20 +1,23 @@
-/* ── Block wrapper ─────────────────────────────────────── */
+/* ── Block wrapper ─────────────────────────────────────────
+   Figma: Section / Footer — 1920×1125px, fill #000000
+   ──────────────────────────────────────────────────────── */
 .snowflake-footer {
   --snowflake-footer-bg: #000;
-  --snowflake-footer-heading: #fff;
-  --snowflake-footer-link: rgba(255, 255, 255, 0.64);
-  --snowflake-footer-link-hover: #fff;
-  --snowflake-footer-padding-x: 220px;
-  --snowflake-footer-col-gap: 8px;
-  --snowflake-footer-section-gap: 40px;
+  --snowflake-footer-text: #fff;
+  --snowflake-footer-muted: rgba(255, 255, 255, 0.64);
+  --snowflake-footer-px: 220px;          /* ~side padding at 1920px desktop */
+  --snowflake-footer-col-gap: 8px;       /* gap between nav columns */
+  --snowflake-footer-section-gap: 40px;  /* vertical gap between sections */
 
   background: var(--snowflake-footer-bg);
-  color: var(--snowflake-footer-heading);
+  color: var(--snowflake-footer-text);
   font-family: var(--body-font-family, adobe-clean, sans-serif);
   overflow: hidden;
 }
 
-/* ── Inner container ───────────────────────────────────── */
+/* ── Inner container ───────────────────────────────────────
+   Figma: Frame 2087328048 — stacks sections vertically
+   ──────────────────────────────────────────────────────── */
 .snowflake-footer-inner {
   display: flex;
   flex-direction: column;
@@ -22,12 +25,15 @@
   padding-block: 64px 0;
 }
 
-/* ── Navigation columns ────────────────────────────────── */
+/* ── Navigation columns ────────────────────────────────────
+   Figma: Footer Links — 1920×476px, 6 cols × 240px wide
+   Padding: (1920 - 6×240) / 2 = 240px → ~220px after gaps
+   ──────────────────────────────────────────────────────── */
 .snowflake-footer-nav {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: var(--snowflake-footer-col-gap);
-  padding-inline: var(--snowflake-footer-padding-x);
+  padding-inline: var(--snowflake-footer-px);
 }
 
 .snowflake-footer-col {
@@ -36,16 +42,17 @@
   gap: 24px;
 }
 
+/* Figma: heading TEXT nodes — fw=700 fs=16 color=#fff */
 .snowflake-footer-col-heading {
-  font-size: 1rem;
+  font-size: 1rem;       /* 16px */
   font-weight: 700;
-  line-height: 1.25;
-  color: var(--snowflake-footer-heading);
+  line-height: 1.25;     /* 20px ÷ 16px */
+  color: var(--snowflake-footer-text);
   margin: 0;
-  /* allow line break after newline chars authored in the table */
-  white-space: pre-line;
+  white-space: pre-line; /* preserve any authored newlines */
 }
 
+/* Figma: link TEXT nodes — fw=400 fs=16 opacity=0.64 */
 .snowflake-footer-col-list {
   list-style: none;
   margin: 0;
@@ -64,46 +71,43 @@
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.25;
-  color: var(--snowflake-footer-link);
+  color: var(--snowflake-footer-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .snowflake-footer-col-list a:hover {
-  color: var(--snowflake-footer-link-hover);
+  color: var(--snowflake-footer-text);
   text-decoration: underline;
 }
 
-/* ── Featured products ─────────────────────────────────── */
+/* ── Featured products row ─────────────────────────────────
+   Figma: Featured Products — 1920×60px
+   Label "Featured Products" fw=700 fs=16, then product chips
+   ──────────────────────────────────────────────────────── */
 .snowflake-footer-products {
-  padding-inline: var(--snowflake-footer-padding-x);
+  padding-inline: var(--snowflake-footer-px);
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 32px;
 }
 
-.snowflake-footer-products p:first-child,
-.snowflake-footer-products > p {
+/* "Featured Products" heading paragraph */
+.snowflake-footer-products > p:first-child,
+.snowflake-footer-products > strong:first-child {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--snowflake-footer-heading);
+  color: var(--snowflake-footer-text);
   margin: 0;
+  flex-shrink: 0;
 }
 
-.snowflake-footer-products ul,
-.snowflake-footer-products div {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 24px;
-}
-
+/* Product chip links */
 .snowflake-footer-products a {
-  font-size: 1rem;
-  color: var(--snowflake-footer-link);
+  font-size: 0.75rem;    /* 12px — Figma product name fw=700 fs=12 */
+  font-weight: 700;
+  color: var(--snowflake-footer-muted);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -112,25 +116,31 @@
 }
 
 .snowflake-footer-products a:hover {
-  color: var(--snowflake-footer-link-hover);
+  color: var(--snowflake-footer-text);
 }
 
+/* Product icon — Figma: 16×16px app icons */
 .snowflake-footer-products img {
   width: 16px;
   height: 16px;
   object-fit: contain;
   display: block;
+  flex-shrink: 0;
 }
 
-/* ── Bottom bar ────────────────────────────────────────── */
+/* ── Bottom bar ────────────────────────────────────────────
+   Figma: Bottom Links — 1920×18px
+   Left: region + copyright + privacy + adchoices  (fs=12 fw=700 opacity=0.64)
+   Right: 4 social icons (18×18px)
+   ──────────────────────────────────────────────────────── */
 .snowflake-footer-bottom {
-  padding-inline: var(--snowflake-footer-padding-x);
+  padding-inline: var(--snowflake-footer-px);
+  padding-block-end: 32px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-block-end: 24px;
+  gap: 12px;
 }
 
 .snowflake-footer-bottom p,
@@ -141,31 +151,33 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 32px;
-  font-size: 0.875rem;
-  color: var(--snowflake-footer-link);
+  gap: 4px 24px;
 }
 
-.snowflake-footer-bottom a {
-  font-size: 0.875rem;
-  color: var(--snowflake-footer-link);
+.snowflake-footer-bottom p,
+.snowflake-footer-bottom li,
+.snowflake-footer-bottom a,
+.snowflake-footer-bottom span {
+  font-size: 0.75rem;    /* 12px — Figma fs=12 */
+  font-weight: 700;
+  color: var(--snowflake-footer-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .snowflake-footer-bottom a:hover {
-  color: var(--snowflake-footer-link-hover);
+  color: var(--snowflake-footer-text);
   text-decoration: underline;
 }
 
-/* Social icons row */
-.snowflake-footer-bottom ul:last-child,
-.snowflake-footer-bottom div:last-child {
+/* Social icons group (last child assumed) */
+.snowflake-footer-bottom > *:last-child {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
 
-.snowflake-footer-bottom ul:last-child a,
-.snowflake-footer-bottom div:last-child a {
+.snowflake-footer-bottom > *:last-child a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -173,11 +185,12 @@
   height: 18px;
 }
 
+/* Social icon images — Figma: 18×18px, opacity=0.64 */
 .snowflake-footer-bottom img {
   width: 18px;
   height: 18px;
   object-fit: contain;
-  filter: brightness(0) invert(0.64);
+  filter: brightness(0) invert(1) opacity(0.64);
   transition: filter 0.15s ease;
 }
 
@@ -185,13 +198,18 @@
   filter: brightness(0) invert(1);
 }
 
-/* ── Logo wordmark ─────────────────────────────────────── */
+/* ── Decorative logo wordmark ───────────────────────────────
+   Figma: Logo frame — 1920×451px — large "adobe" vector
+   Rendered as CSS pseudo-element wordmark (no authored input)
+   ──────────────────────────────────────────────────────── */
 .snowflake-footer-logo {
   position: relative;
-  height: clamp(120px, 25vw, 451px);
+  height: clamp(120px, 23.5vw, 451px); /* 451 / 1920 ≈ 23.5% */
   overflow: hidden;
   display: flex;
   align-items: flex-end;
+  pointer-events: none;
+  user-select: none;
 }
 
 .snowflake-footer-logo::after {
@@ -199,22 +217,22 @@
   display: block;
   font-family: var(--heading-font-family, adobe-clean, sans-serif);
   font-weight: 700;
-  font-size: clamp(120px, 25vw, 478px);
-  line-height: 0.95;
+  /* Target rendered height ≈ 451px at 1920px viewport */
+  font-size: clamp(120px, 24.9vw, 478px);
+  line-height: 0.943; /* keeps cap-height within the 451px frame */
   color: transparent;
-  /* Faint outline wordmark matching Figma vector */
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
   letter-spacing: -0.02em;
   white-space: nowrap;
-  padding-inline-start: var(--snowflake-footer-padding-x);
-  pointer-events: none;
-  user-select: none;
+  padding-inline-start: var(--snowflake-footer-px);
 }
 
-/* ── Responsive — tablet (width >= 768px, stacked) ─────── */
+/* ── Responsive — tablet (768px – 1279px) ──────────────────
+   Reduce side padding, switch nav to 3 columns
+   ──────────────────────────────────────────────────────── */
 @media (width >= 768px) and (width < 1280px) {
   .snowflake-footer {
-    --snowflake-footer-padding-x: 48px;
+    --snowflake-footer-px: 48px;
   }
 
   .snowflake-footer-nav {
@@ -223,10 +241,12 @@
   }
 }
 
-/* ── Responsive — mobile (width < 768px) ──────────────── */
+/* ── Responsive — mobile (< 768px) ────────────────────────
+   Compact padding, 2-column nav, stacked bottom bar
+   ──────────────────────────────────────────────────────── */
 @media (width < 768px) {
   .snowflake-footer {
-    --snowflake-footer-padding-x: 20px;
+    --snowflake-footer-px: 20px;
     --snowflake-footer-section-gap: 32px;
   }
 
@@ -242,6 +262,7 @@
   .snowflake-footer-bottom {
     flex-direction: column;
     align-items: flex-start;
+    padding-block-end: 24px;
   }
 
   .snowflake-footer-logo {
@@ -250,6 +271,6 @@
 
   .snowflake-footer-logo::after {
     font-size: clamp(64px, 20vw, 120px);
-    padding-inline-start: var(--snowflake-footer-padding-x);
+    padding-inline-start: var(--snowflake-footer-px);
   }
 }

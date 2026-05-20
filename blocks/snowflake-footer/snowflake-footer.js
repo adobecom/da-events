@@ -2,41 +2,38 @@ export default function decorate(block) {
   const rows = [...block.querySelectorAll(':scope > div')];
   if (!rows.length) return;
 
-  // Collect authored rows by cell count / content signals
+  // Classify authored rows by structure / content signals
   let navRow = null;
   let productsRow = null;
   let bottomRow = null;
-  let logoRow = null;
 
   rows.forEach((row) => {
     const cells = [...row.querySelectorAll(':scope > div')];
     if (cells.length > 1) {
-      // Multi-cell = navigation columns
+      // Multi-cell row → navigation columns
       navRow = row;
     } else if (cells.length === 1) {
-      const text = cells[0].textContent.trim().toLowerCase();
-      if (text.startsWith('featured') || cells[0].querySelector('picture, img')) {
-        productsRow = cells[0];
-      } else if (
+      const cell = cells[0];
+      const text = cell.textContent.trim().toLowerCase();
+      if (
         text.includes('©')
         || text.includes('region')
-        || text.includes('privacy')
+        || text.includes('do not sell')
         || text.includes('copyright')
+        || text.includes('adchoice')
       ) {
-        bottomRow = cells[0];
-      } else if (text.includes('adobe') && cells[0].childElementCount <= 1) {
-        logoRow = cells[0];
+        bottomRow = cell;
       } else {
-        productsRow = productsRow || cells[0];
+        productsRow = productsRow || cell;
       }
     }
   });
 
-  // ── Build wrapper ───────────────────────────────────────
+  // ── Build inner wrapper ──────────────────────────────────
   const inner = document.createElement('div');
   inner.className = 'snowflake-footer-inner';
 
-  // ── 1. Navigation columns ───────────────────────────────
+  // ── 1. Navigation columns ────────────────────────────────
   if (navRow) {
     const nav = document.createElement('nav');
     nav.className = 'snowflake-footer-nav';
@@ -47,10 +44,10 @@ export default function decorate(block) {
       const col = document.createElement('div');
       col.className = 'snowflake-footer-col';
 
-      // First strong/heading as column heading
-      const headingEl = cell.querySelector('strong, h2, h3, h4, b');
+      // First bold/strong/heading element as the column heading
+      const headingEl = cell.querySelector('strong, b, h2, h3, h4');
       const headingText = headingEl
-        ? headingEl.closest('p')?.textContent.trim() || headingEl.textContent.trim()
+        ? (headingEl.closest('p')?.textContent ?? headingEl.textContent).trim()
         : null;
 
       if (headingText) {
@@ -60,7 +57,7 @@ export default function decorate(block) {
         col.append(heading);
       }
 
-      // Links list
+      // Gather links into a <ul>
       const links = [...cell.querySelectorAll('a')];
       if (links.length) {
         const ul = document.createElement('ul');
@@ -73,7 +70,7 @@ export default function decorate(block) {
         });
         col.append(ul);
       } else {
-        // Fall back to plain text items (paragraphs that aren't the heading)
+        // Fallback: plain-text paragraphs that aren't the heading paragraph
         const paras = [...cell.querySelectorAll('p')];
         const linkParas = paras.filter(
           (p) => !p.querySelector('strong, b') && p.textContent.trim(),
@@ -96,7 +93,7 @@ export default function decorate(block) {
     inner.append(nav);
   }
 
-  // ── 2. Featured products ────────────────────────────────
+  // ── 2. Featured products row ─────────────────────────────
   if (productsRow) {
     const products = document.createElement('div');
     products.className = 'snowflake-footer-products';
@@ -104,7 +101,7 @@ export default function decorate(block) {
     inner.append(products);
   }
 
-  // ── 3. Bottom bar ───────────────────────────────────────
+  // ── 3. Bottom bar (copyright + socials) ──────────────────
   if (bottomRow) {
     const bottom = document.createElement('div');
     bottom.className = 'snowflake-footer-bottom';
@@ -112,19 +109,11 @@ export default function decorate(block) {
     inner.append(bottom);
   }
 
-  // ── 4. Logo mark ────────────────────────────────────────
-  if (logoRow) {
-    const logo = document.createElement('div');
-    logo.className = 'snowflake-footer-logo';
-    [...logoRow.childNodes].forEach((node) => logo.append(node.cloneNode(true)));
-    inner.append(logo);
-  } else {
-    // Render the decorative wordmark via CSS pseudo-element (no author input needed)
-    const logo = document.createElement('div');
-    logo.className = 'snowflake-footer-logo';
-    logo.setAttribute('aria-hidden', 'true');
-    inner.append(logo);
-  }
+  // ── 4. Decorative logo wordmark ──────────────────────────
+  const logo = document.createElement('div');
+  logo.className = 'snowflake-footer-logo';
+  logo.setAttribute('aria-hidden', 'true');
+  inner.append(logo);
 
   block.innerHTML = '';
   block.append(inner);

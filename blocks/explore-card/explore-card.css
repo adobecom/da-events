@@ -1,0 +1,170 @@
+/* ── Block-scoped custom properties ── */
+.explore-card {
+  --explore-card-bg: #000;
+  --explore-card-card-bg: rgba(255, 255, 255, 0.08);
+  --explore-card-card-hover-bg: rgba(255, 255, 255, 0.12);
+  --explore-card-text: #fff;
+  /* Figma: rgba(255,255,255,0.64) on secondary/description text */
+  --explore-card-text-secondary: rgba(255, 255, 255, 0.64);
+  --explore-card-card-radius: 16px;
+  --explore-card-card-padding: 24px;
+  /* Figma: 32px column/row gap between cards */
+  --explore-card-grid-gap: 32px;
+
+  background: var(--explore-card-bg);
+}
+
+/* ── Inner max-width container ── */
+.explore-card > div {
+  max-width: 1480px; /* 1920 − 220×2 = 1480px inner content at desktop */
+  margin-inline: auto;
+}
+
+/* ── Card grid — mobile-first: single column ── */
+.explore-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--explore-card-grid-gap);
+  padding-block: 40px;
+  padding-inline: 20px;
+}
+
+/* ── Individual card ── */
+.explore-card-item {
+  background: var(--explore-card-card-bg);
+  backdrop-filter: blur(33px);
+  -webkit-backdrop-filter: blur(33px);
+  border-radius: var(--explore-card-card-radius);
+  padding: var(--explore-card-card-padding);
+  display: flex;
+  flex-direction: column;
+  /* SPACE_BETWEEN: icon at top, content pushed to bottom */
+  justify-content: space-between;
+  min-block-size: 200px;
+  transition: background-color 0.2s ease;
+}
+
+.explore-card-item:hover {
+  background: var(--explore-card-card-hover-bg);
+}
+
+.explore-card-item[data-href] {
+  cursor: pointer;
+}
+
+/* ── Icon area (product brand mark + optional badge text) ── */
+.explore-card-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.explore-card-icon picture {
+  display: block;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.explore-card-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Badge text alongside icon (e.g. "20+ Apps") */
+.explore-card-icon p {
+  font-size: 0.875rem; /* 14px — Figma badge text */
+  font-weight: 700;
+  color: var(--explore-card-text);
+  margin: 0;
+}
+
+/* ── Content area (heading + description) ── */
+.explore-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Figma: itemSpacing 8px between headline and sub-headline */
+}
+
+.explore-card-content h2,
+.explore-card-content h3,
+.explore-card-content h4 {
+  font-size: 1.5rem; /* 24px — Figma H3 Headline */
+  font-weight: 900;
+  line-height: 1; /* 24px/24px = 100% — matches Figma lineHeightPx 24 */
+  letter-spacing: -0.02em; /* -0.48px at 24px — matches Figma */
+  color: var(--explore-card-text);
+  margin: 0;
+}
+
+.explore-card-content p {
+  font-size: 1rem; /* 16px — Figma Sub Headline fontSize */
+  font-weight: 400;
+  line-height: 1.25; /* 20px/16px = 125% — matches Figma lineHeightPx 20 */
+  letter-spacing: 0.01em; /* ~0.16px — matches Figma letterSpacing */
+  color: var(--explore-card-text-secondary);
+  margin: 0;
+}
+
+/* ── CTA actions ── */
+.explore-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 8px;
+}
+
+.explore-card-actions a {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--explore-card-text);
+  text-decoration: none;
+}
+
+.explore-card-actions a:hover {
+  text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════
+   Tablet (768px+): 2-column card grid
+   ═══════════════════════════════════════ */
+@media (width >= 768px) {
+  .explore-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding-block: 60px;
+    padding-inline: 48px;
+  }
+
+  .explore-card-item {
+    min-block-size: 220px;
+  }
+}
+
+/* ═══════════════════════════════════════
+   Desktop (1280px+): 3-column card grid
+   ═══════════════════════════════════════ */
+@media (width >= 1280px) {
+  .explore-card-grid {
+    grid-template-columns: repeat(3, 1fr);
+    padding-block: 80px;
+    /* Scales toward 220px at 1920px: 220/1920 ≈ 11.46% */
+    padding-inline: clamp(48px, 11.46vw, 220px);
+  }
+
+  .explore-card-item {
+    /* Match Figma card height: 255px */
+    min-block-size: 255px;
+  }
+}
+
+/* ═══════════════════════════════════════
+   XL (1920px+): inner container fills without inline padding
+   ═══════════════════════════════════════ */
+@media (width >= 1920px) {
+  .explore-card-grid {
+    padding-inline: 0;
+  }
+}

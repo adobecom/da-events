@@ -3,7 +3,7 @@ export default function decorate(block) {
   if (!rows.length) return;
 
   // ── 1. Parse authored rows ──────────────────────────────────────────────────
-  // Row 0: Copy lockup — h2 (headline) + p (subheadline)
+  // Row 0: Copy lockup — h2/h3 (headline) + p (subheadline)
   // Row 1: Search placeholder text (e.g. "Ask anything")
   // Row 2: Disclaimer text (may contain links)
   const copyCell = rows[0]?.querySelector(':scope > div') || rows[0];
@@ -33,7 +33,7 @@ export default function decorate(block) {
   inputGroup.className = 'snowflake-agentic-search-input-group';
   inputGroup.setAttribute('role', 'search');
 
-  // Gradient sparkle / AI icon (matches Figma purple→red gradient vector)
+  // Gradient sparkle / AI icon (Figma: gradient #8d87f2 purple → #eb1000 red)
   const iconWrap = document.createElement('div');
   iconWrap.className = 'snowflake-agentic-search-icon';
   iconWrap.setAttribute('aria-hidden', 'true');

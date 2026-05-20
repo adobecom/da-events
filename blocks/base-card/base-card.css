@@ -1,0 +1,203 @@
+/* ── Block root ──────────────────────────────────────────── */
+.base-card {
+  --base-card-bg: #ffffff;
+  --base-card-text: #2c2c2c;
+  --base-card-muted: rgba(0, 0, 0, 0.64);
+  --base-card-placeholder: #e8e8e8;
+  --base-card-radius: 16px;
+  --base-card-padding: 24px;
+  --base-card-gap: 8px;
+}
+
+/* ── Inner wrapper ───────────────────────────────────────── */
+.base-card-inner {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--base-card-radius);
+  overflow: hidden;
+  background: var(--base-card-bg);
+  height: 100%;
+}
+
+/* ── Media area ──────────────────────────────────────────── */
+.base-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--base-card-placeholder);
+  border-radius: var(--base-card-radius);
+  flex-shrink: 0;
+}
+
+.base-card-media picture,
+.base-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Copy area ───────────────────────────────────────────── */
+.base-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--base-card-gap);
+  padding: var(--base-card-padding);
+  flex: 1;
+}
+
+.base-card-copy h2,
+.base-card-copy h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--base-card-text);
+  margin: 0;
+}
+
+.base-card-copy p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--base-card-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Eyebrow ─────────────────────────────────────────────── */
+.base-card-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--base-card-muted);
+  /* Reset the 3-line clamp inherited from .base-card-copy p */
+  display: block;
+  overflow: visible;
+}
+
+/* ── CTA actions ─────────────────────────────────────────── */
+.base-card-actions {
+  margin-block-start: 16px;
+}
+
+/* Text-link CTA (plain link, no em/strong wrapping) */
+.base-card-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--base-card-text);
+  text-decoration: none;
+}
+
+.base-card-actions a::after {
+  content: '→';
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+
+.base-card-actions a:hover {
+  text-decoration: underline;
+}
+
+.base-card-actions a:hover::after {
+  transform: translateX(4px);
+}
+
+/* Primary CTA (link wrapped in <strong>) */
+.base-card-actions strong a {
+  display: inline-flex;
+  padding: 13px 28px;
+  border-radius: 4px;
+  background: #eb1000;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.base-card-actions strong a::after {
+  display: none;
+}
+
+/* Secondary CTA (link wrapped in <em>) */
+.base-card-actions em a {
+  display: inline-flex;
+  padding: 12px 28px;
+  border-radius: 4px;
+  border: 2px solid #2c2c2c;
+  color: #2c2c2c;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.base-card-actions em a::after {
+  display: none;
+}
+
+/* ── Featured variant ────────────────────────────────────── */
+/* Featured cards use a wide cinematic image ratio (≈ 16:7) */
+.base-card.featured .base-card-media {
+  aspect-ratio: 16 / 7;
+}
+
+.base-card.featured .base-card-copy h2,
+.base-card.featured .base-card-copy h3 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+}
+
+/* ── Tablet (≥ 768px) ────────────────────────────────────── */
+@media (width >= 768px) {
+  .base-card-copy {
+    padding: 28px 32px 32px;
+  }
+
+  /* Featured copy flips to horizontal: headline+body on left, CTA on right */
+  .base-card.featured .base-card-copy {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .base-card.featured .base-card-copy > *:not(.base-card-actions) {
+    flex: 1;
+  }
+
+  .base-card.featured .base-card-actions {
+    flex-shrink: 0;
+    margin-block-start: 0;
+    white-space: nowrap;
+  }
+
+  .base-card-copy h2,
+  .base-card-copy h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ── Desktop (≥ 1280px) ──────────────────────────────────── */
+@media (width >= 1280px) {
+  .base-card-copy {
+    padding: 32px 40px 40px;
+  }
+
+  .base-card-copy h2,
+  .base-card-copy h3 {
+    font-size: clamp(1.25rem, 1.75vw, 1.5rem);
+  }
+
+  .base-card-copy p {
+    font-size: 1rem;
+  }
+
+  .base-card-actions a {
+    font-size: 0.875rem;
+  }
+}
