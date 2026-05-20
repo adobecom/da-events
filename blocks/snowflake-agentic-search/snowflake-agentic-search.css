@@ -1,13 +1,21 @@
 /* ── Block root ─────────────────────────────────────────────────────────────── */
-/* Black full-width section strip (1920×262px in Figma) */
+/* Figma: 1920×262px, fills solid #000000 */
 .snowflake-agentic-search {
-  background: #000;           /* Figma: fills[0] solid #000000 */
+  --sas-bg: #000;
+  --sas-text: #fff;
+  --sas-text-muted: rgba(255, 255, 255, 0.60);
+  --sas-input-bg: rgba(255, 255, 255, 0.10);
+  --sas-input-border: rgba(0, 0, 0, 0.10);
+  --sas-sparkle-start: #8d87f2;   /* purple stop of gradient vector */
+  --sas-sparkle-end: #eb1000;     /* red stop of gradient vector */
+
+  background: var(--sas-bg);
   padding-block: 48px;
   width: 100%;
 }
 
 /* ── Centered max-width container ───────────────────────────────────────────── */
-/* Figma inner frame: 1672px wide — using 1280px for responsive safety */
+/* Figma inner frame: 1672px wide */
 .snowflake-agentic-search > div {
   max-width: 1280px;
   margin-inline: auto;
@@ -28,51 +36,50 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;           /* Figma itemSpacing: 7.5 ≈ 8px */
+  gap: 8px;
   text-align: center;
-  padding-block-end: 8px;   /* accounts for Figma paddingBottom: 32px within Copy Lockup */
 }
 
 /* Headline — Figma: 56px, weight 900, Adobe Clean Display Black, white, ls: -1.68px */
 .snowflake-agentic-search-copy h2,
 .snowflake-agentic-search-copy h3 {
-  color: #fff;
+  color: var(--sas-text);
   font-family: var(--heading-font-family, sans-serif);
-  font-size: clamp(2rem, 4vw, 3.5rem);   /* scales toward 56px at ~1400px viewport */
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.03em;   /* Figma: -1.68px at 56px ≈ -0.03em */
+  letter-spacing: -0.03em;
   margin: 0;
 }
 
-/* Subheadline — Figma: 20px, weight 400, Adobe Clean, white, ls: -0.4px, lh: 26px (130%) */
+/* Sub-headline — Figma: 20px, weight 400, Adobe Clean, white, lh: 130% */
 .snowflake-agentic-search-copy p {
-  color: #fff;
+  color: var(--sas-text);
   font-family: var(--body-font-family, sans-serif);
-  font-size: 1.25rem;    /* 20px */
+  font-size: 1.25rem;
   font-weight: 400;
-  line-height: 1.3;      /* Figma: 130% */
-  letter-spacing: -0.02em;  /* Figma: -0.4px at 20px ≈ -0.02em */
+  line-height: 1.3;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
 /* ── Search input group ─────────────────────────────────────────────────────── */
-/* Figma: 768×56px, white bg, cornerRadius: 28px (pill), stroke border */
+/* Figma: 768×56px, rgba(255,255,255,0.10) fill, rgba(0,0,0,0.10) stroke 2px, cornerRadius 28px */
 .snowflake-agentic-search-input-group {
   display: flex;
   align-items: center;
-  background: #fff;
-  border-radius: 28px;     /* Figma cornerRadius: 28.0 — pill shape (56px/2) */
+  background: var(--sas-input-bg);
+  border: 2px solid var(--sas-input-border);
+  border-radius: 28px;
   width: 100%;
-  max-width: 768px;        /* Figma input group width */
-  height: 56px;            /* Figma input group height */
+  max-width: 768px;
+  height: 56px;
   padding-inline: 16px 8px;
   gap: 8px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.14);  /* subtle border for contrast on black bg */
 }
 
-/* ── AI sparkle icon ────────────────────────────────────────────────────────── */
-/* Figma: 14×14px vector, gradient from #8d87f2 (purple) at bottom to #eb1000 (red) at top */
+/* ── AI sparkle / gradient icon ──────────────────────────────────────────────── */
+/* Figma: 14×14px vector, linear-gradient purple→red, in a 24px left-padded frame */
 .snowflake-agentic-search-icon {
   display: flex;
   align-items: center;
@@ -83,7 +90,7 @@
 }
 
 /* ── Text input field ───────────────────────────────────────────────────────── */
-/* Figma input text: "Ask anything", 674px wide within the group */
+/* Figma: 16px, "Ask anything" placeholder at 60% white opacity */
 .snowflake-agentic-search-field {
   flex: 1;
   min-inline-size: 0;
@@ -92,15 +99,16 @@
   background: transparent;
   font-family: var(--body-font-family, sans-serif);
   font-size: 1rem;
-  color: #2c2c2c;
+  line-height: 1.5;
+  color: var(--sas-text);
 }
 
 .snowflake-agentic-search-field::placeholder {
-  color: #6e6e6e;
+  color: var(--sas-text-muted);
 }
 
-/* ── Action buttons ─────────────────────────────────────────────────────────── */
-/* Figma "Controlls" frame: 56px wide, action buttons 32×32px each */
+/* ── Action buttons row ─────────────────────────────────────────────────────── */
+/* Figma "Controlls" frame: 56px wide, action buttons 32×32px */
 .snowflake-agentic-search-actions {
   display: flex;
   align-items: center;
@@ -119,55 +127,53 @@
   background: transparent;
   cursor: pointer;
   border-radius: 50%;
-  color: #464646;
-  transition: background 0.15s ease;
+  color: var(--sas-text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .snowflake-agentic-search-action-btn:hover {
-  background: rgba(0, 0, 0, 0.07);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--sas-text);
 }
 
 .snowflake-agentic-search-action-btn:focus-visible {
-  outline: 2px solid #0265dc;
+  outline: 2px solid #fff;
   outline-offset: 2px;
 }
 
-/* Send button — filled dark (matches Figma send affordance icon style) */
+/* Send button — filled circle (matches Figma send affordance) */
 .snowflake-agentic-search-send-btn {
-  background: #292929;    /* Figma: iconPrimary fill #292929 */
-  color: #fff;
+  background: rgba(255, 255, 255, 0.20);
+  color: var(--sas-text);
 }
 
 .snowflake-agentic-search-send-btn:hover {
-  background: #444;
-}
-
-.snowflake-agentic-search-send-btn:focus-visible {
-  outline-color: #fff;
+  background: rgba(255, 255, 255, 0.30);
 }
 
 /* ── Disclaimer text ────────────────────────────────────────────────────────── */
-/* Figma: 12px, regular, line-height 18px (150%), white, centered */
+/* Figma: 12px, regular, lh 150% (18px), white 60% opacity, centered */
 .snowflake-agentic-search-disclaimer {
   text-align: center;
+  max-width: 768px;
 }
 
 .snowflake-agentic-search-disclaimer p {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--sas-text-muted);
   font-family: var(--body-font-family, sans-serif);
-  font-size: 0.75rem;    /* 12px */
+  font-size: 0.75rem;
   font-weight: 400;
-  line-height: 1.5;      /* Figma: 18px / 12px = 150% */
+  line-height: 1.5;
   margin: 0;
 }
 
 .snowflake-agentic-search-disclaimer a {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--sas-text-muted);
   text-decoration: underline;
 }
 
 .snowflake-agentic-search-disclaimer a:hover {
-  color: #fff;
+  color: var(--sas-text);
 }
 
 /* ── Responsive: tablet (768px+) ────────────────────────────────────────────── */
@@ -184,6 +190,6 @@
 /* ── Responsive: desktop (1280px+) ─────────────────────────────────────────── */
 @media (width >= 1280px) {
   .snowflake-agentic-search {
-    padding-block: 64px;    /* slightly tighter to approach Figma's 262px total */
+    padding-block: 64px;
   }
 }

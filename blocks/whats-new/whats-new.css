@@ -1,0 +1,228 @@
+/* ── Block wrapper ── */
+.whats-new {
+  --whats-new-bg: #fff;
+  --whats-new-text: #2c2c2c;
+  --whats-new-muted: #6e6e6e;
+  --whats-new-eyebrow-color: rgba(0, 0, 0, 0.64);
+  --whats-new-cta-color: #000;
+  --whats-new-radius: 8px;
+
+  background: var(--whats-new-bg);
+  padding-block: 48px;
+}
+
+/* ── Inner container ── */
+.whats-new > div {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* ── Section heading ── */
+.whats-new-heading {
+  text-align: center;
+  margin-block-end: 40px;
+}
+
+.whats-new-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--whats-new-eyebrow-color);
+  margin-block: 0 8px;
+}
+
+.whats-new-heading h2 {
+  font-size: clamp(1.75rem, 6vw, 3.5rem);
+  font-weight: 900;
+  color: #000;
+  line-height: 1;
+  margin-block: 0 8px;
+}
+
+.whats-new-heading p:not(.whats-new-eyebrow) {
+  font-size: 1.125rem;
+  color: var(--whats-new-text);
+  line-height: 1.4;
+  margin-block: 0;
+}
+
+/* ── Cards container ── */
+.whats-new-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ── Card base ── */
+.whats-new-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Media wrapper ── */
+.whats-new-media {
+  border-radius: var(--whats-new-radius);
+  overflow: hidden;
+  line-height: 0;
+}
+
+.whats-new-media img,
+.whats-new-media picture {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Featured card ── */
+.whats-new-card--featured .whats-new-media {
+  aspect-ratio: 2.21 / 1;
+}
+
+.whats-new-card--featured .whats-new-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.whats-new-card--featured .whats-new-copy-text h2,
+.whats-new-card--featured .whats-new-copy-text h3 {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: #000;
+  line-height: 1.2;
+  margin-block: 0 6px;
+}
+
+.whats-new-card--featured .whats-new-copy-text p {
+  font-size: 0.9375rem;
+  color: var(--whats-new-text);
+  line-height: 1.55;
+  margin-block: 0;
+}
+
+/* ── 3-column grid ── */
+.whats-new-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.whats-new-grid .whats-new-media {
+  aspect-ratio: 4 / 3;
+}
+
+.whats-new-grid .whats-new-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.whats-new-grid .whats-new-copy h2,
+.whats-new-grid .whats-new-copy h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #000;
+  line-height: 1.3;
+  margin-block: 0 8px;
+}
+
+.whats-new-grid .whats-new-copy p {
+  font-size: 0.9375rem;
+  color: var(--whats-new-text);
+  line-height: 1.55;
+  margin-block: 0;
+}
+
+/* ── CTA actions ── */
+.whats-new-actions {
+  margin-block-start: 12px;
+}
+
+.whats-new-actions p {
+  margin-block: 0;
+}
+
+.whats-new-actions a {
+  color: var(--whats-new-cta-color);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.whats-new-actions a::after {
+  /* Right-angle quotation mark used as chevron arrow */
+  content: '›';
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.whats-new-actions a:hover {
+  text-decoration: underline;
+}
+
+/* ── Tablet ── */
+@media (width >= 768px) {
+  .whats-new {
+    padding-block: 64px;
+  }
+
+  .whats-new > div {
+    padding-inline: 32px;
+  }
+
+  .whats-new-heading {
+    margin-block-end: 48px;
+  }
+
+  .whats-new-heading p:not(.whats-new-eyebrow) {
+    font-size: 1.25rem;
+  }
+
+  /* Featured card copy: headline+body on left, CTA on right */
+  .whats-new-card--featured .whats-new-copy {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .whats-new-card--featured .whats-new-copy-text {
+    flex: 1;
+  }
+
+  .whats-new-card--featured .whats-new-actions {
+    flex-shrink: 0;
+    margin-block-start: 0;
+  }
+
+  .whats-new-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Desktop ── */
+@media (width >= 1280px) {
+  .whats-new {
+    padding-block: 80px;
+  }
+
+  .whats-new > div {
+    padding-inline: 48px;
+  }
+
+  .whats-new-cards {
+    gap: 64px;
+  }
+
+  .whats-new-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
