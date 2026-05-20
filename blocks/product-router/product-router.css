@@ -1,0 +1,279 @@
+/* ── Block-scoped custom properties ── */
+.product-router {
+  --product-router-grid-bg: #000;
+  --product-router-card-bg: rgba(255, 255, 255, 0.08);
+  --product-router-card-hover-bg: rgba(255, 255, 255, 0.12);
+  --product-router-text: #fff;
+  --product-router-text-secondary: rgba(255, 255, 255, 0.75);
+  --product-router-hero-gradient: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 5%,
+    rgba(0, 0, 0, 0) 25%,
+    rgba(0, 0, 0, 0) 65%,
+    rgba(0, 0, 0, 1) 95%
+  );
+  --product-router-grid-gap: 8px;
+  --product-router-card-padding: 24px;
+  --product-router-card-radius: 4px;
+  --product-router-cta-border: rgba(255, 255, 255, 0.8);
+}
+
+/* ═══════════════════════════════════════
+   Hero section
+   ═══════════════════════════════════════ */
+.product-router-hero {
+  position: relative;
+  /* Scale height with viewport width, clamped to design spec */
+  height: clamp(400px, 54vw, 1040px);
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  /* Padding-top drives the text position: mirrors Figma's 160px at 1920px */
+  padding-block-start: clamp(40px, 8.33vw, 160px);
+  padding-inline: 8px;
+}
+
+/* Background image — fills the full hero area */
+.product-router-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+.product-router-hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gradient overlay: black vignette top and bottom */
+.product-router-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--product-router-hero-gradient);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Text content sits above the gradient overlay */
+.product-router-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  width: 100%;
+  max-width: 1904px;
+  margin-inline: auto;
+}
+
+.product-router-hero-content h1,
+.product-router-hero-content h2 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--product-router-text);
+  margin: 0;
+}
+
+.product-router-hero-content p {
+  font-size: clamp(1rem, 1.25vw, 1.25rem);
+  line-height: 1.4;
+  /* #f8f8f8 ≈ rgba(248,248,248,1) — matches Figma's 0.97 white channel */
+  color: #f8f8f8;
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+/* ── Hero CTA actions ── */
+.product-router-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-block-start: 16px;
+}
+
+.product-router-hero-actions p {
+  margin: 0;
+}
+
+/* Frosted-glass pill button — matches Figma Action 5 */
+.product-router-hero-actions a {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 24px;
+  border-radius: 75px;
+  border: 1px solid var(--product-router-cta-border);
+  backdrop-filter: blur(18.75px);
+  -webkit-backdrop-filter: blur(18.75px);
+  color: var(--product-router-text);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.875rem; /* 14px — matches Figma */
+  line-height: 1.286;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.product-router-hero-actions a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+/* ═══════════════════════════════════════
+   Card grid section
+   ═══════════════════════════════════════ */
+.product-router-grid-section {
+  background: var(--product-router-grid-bg);
+}
+
+.product-router-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--product-router-grid-gap);
+  max-width: 1480px; /* 1920 − 220×2 = 1480px inner content at desktop */
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+/* ── Product card ── */
+.product-router-card {
+  background: var(--product-router-card-bg);
+  border-radius: var(--product-router-card-radius);
+  padding: var(--product-router-card-padding);
+  display: flex;
+  flex-direction: column;
+  /* SPACE_BETWEEN: icon stays at top, content pushed to bottom */
+  justify-content: space-between;
+  min-block-size: 200px;
+  transition: background-color 0.2s ease;
+}
+
+.product-router-card:hover {
+  background: var(--product-router-card-hover-bg);
+}
+
+.product-router-card[data-href] {
+  cursor: pointer;
+}
+
+/* ── Card icon area (product brand mark + optional badge) ── */
+.product-router-card-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-router-card-icon picture {
+  display: block;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.product-router-card-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Badge text (e.g. "20+ Apps" on Creative Cloud card) */
+.product-router-card-icon p {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--product-router-text);
+  margin: 0;
+}
+
+/* ── Card content (title + description) ── */
+.product-router-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-router-card-content h2,
+.product-router-card-content h3,
+.product-router-card-content h4 {
+  font-size: 1.5rem; /* 24px — matches Figma H3 */
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--product-router-text);
+  margin: 0;
+}
+
+.product-router-card-content p {
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.4;
+  color: var(--product-router-text-secondary);
+  margin: 0;
+}
+
+/* ── Card CTA actions ── */
+.product-router-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 8px;
+}
+
+.product-router-card-actions a {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--product-router-text);
+  text-decoration: none;
+}
+
+.product-router-card-actions a:hover {
+  text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════
+   Tablet (768px+): 2-column card grid
+   ═══════════════════════════════════════ */
+@media (width >= 768px) {
+  .product-router-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding-inline: 48px;
+  }
+
+  .product-router-card {
+    min-block-size: 220px;
+  }
+}
+
+/* ═══════════════════════════════════════
+   Desktop (1280px+): 3-column card grid
+   ═══════════════════════════════════════ */
+@media (width >= 1280px) {
+  .product-router-grid {
+    grid-template-columns: repeat(3, 1fr);
+    /* Scales toward 220px at 1920px: 220/1920 ≈ 11.46% */
+    padding-inline: clamp(48px, 11.46vw, 220px);
+  }
+
+  .product-router-card {
+    /* Match Figma card height: 255px */
+    min-block-size: 255px;
+  }
+}
+
+/* ═══════════════════════════════════════
+   XL (1440px+): full padding reaches 220px
+   ═══════════════════════════════════════ */
+@media (width >= 1920px) {
+  .product-router-grid {
+    padding-inline: 0;
+  }
+}

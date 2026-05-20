@@ -1,0 +1,342 @@
+/* ── Block: router-marquee ──────────────────────────────────────
+   Hero marquee with a bottom router-tab navigation bar.
+   Authors: background image + eyebrow/heading/body/CTAs in row 0,
+   then one row per tab (icon cell | label+link cell).
+   ──────────────────────────────────────────────────────────────── */
+
+.router-marquee {
+  --router-marquee-accent: #eb1000;
+  --router-marquee-bg: #141414;
+  --router-marquee-text: #fff;
+  --router-marquee-text-body: #f8f8f8;
+  --router-marquee-tab-active-bg: #fff;
+  --router-marquee-tab-active-text: #141414;
+  --router-marquee-tab-border: rgba(255, 255, 255, 0.12);
+  --router-marquee-nav-bg: rgba(0, 0, 0, 0.55);
+
+  position: relative;
+  background: var(--router-marquee-bg);
+  color: var(--router-marquee-text);
+  overflow: hidden;
+}
+
+/* ── Hero region ─────────────────────────────────────────────── */
+
+.router-marquee-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  /* bottom pad = nav height (~68px) + breathing room (~80px) */
+  min-height: 480px;
+  padding-block: 48px 148px;
+  padding-inline: 20px;
+}
+
+/* Background image — covers full hero including nav zone */
+.router-marquee-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.router-marquee-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gradient overlay: diagonal top-left (60% black) → bottom-right (20% black)
+   Matches Figma GRADIENT_LINEAR handles and stops */
+.router-marquee-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    108deg,
+    rgba(0, 0, 0, 0.60) 0%,
+    rgba(0, 0, 0, 0.20) 100%
+  );
+  pointer-events: none;
+}
+
+/* Text content wrapper */
+.router-marquee-content {
+  position: relative;
+  z-index: 2;
+  max-width: 667px;
+  width: 100%;
+}
+
+/* Eyebrow label (e.g. "Acrobat") */
+.router-marquee-eyebrow {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--router-marquee-text);
+  margin-block: 0 12px;
+  margin-inline: 0;
+}
+
+/* Headline */
+.router-marquee-content h1,
+.router-marquee-content h2,
+.router-marquee-content h3 {
+  font-size: clamp(2rem, 5.5vw, 5rem);
+  font-weight: 900;
+  color: var(--router-marquee-text);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-block: 0 20px;
+  margin-inline: 0;
+}
+
+/* Body copy (excludes eyebrow and action paragraphs) */
+.router-marquee-content p:not(.router-marquee-eyebrow) {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--router-marquee-text-body);
+  margin-block: 0 12px;
+  margin-inline: 0;
+  max-width: 500px;
+}
+
+/* CTA row */
+.router-marquee-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 32px;
+}
+
+/* Primary CTA — white filled pill (authored as **[label](url)**) */
+.router-marquee-actions strong a {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 10px;
+  padding-inline: 24px;
+  border-radius: 75px;
+  background: var(--router-marquee-tab-active-bg);
+  color: var(--router-marquee-tab-active-text);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.router-marquee-actions strong a:hover {
+  background: #e8e8e8;
+}
+
+/* Secondary CTA — ghost/outline pill (authored as *[label](url)*) */
+.router-marquee-actions em a {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 9px;
+  padding-inline: 24px;
+  border-radius: 75px;
+  border: 1px solid var(--router-marquee-text);
+  background: transparent;
+  color: var(--router-marquee-text);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.router-marquee-actions em a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Router Navigation ───────────────────────────────────────── */
+
+.router-marquee-nav {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 3;
+  display: flex;
+  align-items: stretch;
+  background: var(--router-marquee-nav-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-block-start: 1px solid var(--router-marquee-tab-border);
+}
+
+/* Tab list — horizontal, scrollable on small screens */
+.router-marquee-tabs {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.router-marquee-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual tab */
+.router-marquee-tab {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding-block: 16px;
+  padding-inline: 16px;
+  color: var(--router-marquee-text);
+  text-decoration: none;
+  background: transparent;
+  flex: 1 1 0;
+  min-width: 160px;
+  border-inline-end: 1px solid var(--router-marquee-tab-border);
+  transition: background 0.2s;
+  overflow: hidden;
+}
+
+.router-marquee-tab:last-child {
+  border-inline-end: none;
+}
+
+.router-marquee-tab:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Active state: white background, dark text */
+.router-marquee-tab.is-active {
+  background: var(--router-marquee-tab-active-bg);
+  color: var(--router-marquee-tab-active-text);
+}
+
+/* Indicator bar at the top of each tab (red on active) */
+.router-marquee-tab-indicator {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 16px;
+  width: 96px;
+  height: 4px;
+  border-radius: 0 0 2px 2px;
+  background: transparent;
+}
+
+.router-marquee-tab.is-active .router-marquee-tab-indicator {
+  background: var(--router-marquee-accent);
+}
+
+/* Product icon */
+.router-marquee-tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.router-marquee-tab-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Category label */
+.router-marquee-tab-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Chevron arrow */
+.router-marquee-tab-chevron {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  opacity: 0.6;
+}
+
+.router-marquee-tab-chevron svg {
+  width: 6px;
+  height: 10px;
+  display: block;
+}
+
+.router-marquee-tab.is-active .router-marquee-tab-chevron {
+  opacity: 1;
+}
+
+/* Play / Pause circular button */
+.router-marquee-play-pause {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin-block: auto;
+  margin-inline: 12px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.44);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.router-marquee-play-pause svg {
+  width: 10px;
+  height: 12px;
+  display: block;
+}
+
+.router-marquee-play-pause:hover {
+  background: rgba(0, 0, 0, 0.64);
+}
+
+.router-marquee-play-pause:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Tablet (≥ 768px) ────────────────────────────────────────── */
+
+@media (width >= 768px) {
+  .router-marquee-hero {
+    min-height: 560px;
+    padding-block: 80px 148px;
+    padding-inline: 40px;
+  }
+
+  .router-marquee-tab {
+    min-width: 180px;
+    padding-inline: 20px;
+  }
+}
+
+/* ── Desktop (≥ 1280px) ──────────────────────────────────────── */
+
+@media (width >= 1280px) {
+  .router-marquee-hero {
+    min-height: 640px;
+    padding-block: 120px 148px;
+    padding-inline: 64px;
+  }
+
+  .router-marquee-tab {
+    min-width: 200px;
+    padding-inline: 24px;
+  }
+
+  .router-marquee-tab-indicator {
+    inset-inline-start: 24px;
+  }
+}

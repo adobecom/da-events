@@ -1,0 +1,318 @@
+/* ── Block wrapper ── */
+.hub-router {
+  --hub-router-bg: #ffffff;
+  --hub-router-card-bg: #f5f5f5;
+  --hub-router-card-dark-bg: #000000;
+  --hub-router-text: #2c2c2c;
+  --hub-router-text-muted: #6e6e6e;
+  --hub-router-eyebrow-color: rgba(0, 0, 0, 0.64);
+  --hub-router-accent: #eb1000;
+  --hub-router-card-radius: 16px;
+  --hub-router-card-gap: 8px;
+  --hub-router-card-padding: 16px;
+
+  background: var(--hub-router-bg);
+  padding-block: 48px;
+}
+
+/* ── Section heading ── */
+.hub-router-heading {
+  max-width: 1480px;
+  margin-inline: auto;
+  margin-block-end: 48px;
+  padding-inline: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.hub-router-eyebrow {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--hub-router-eyebrow-color);
+  margin: 0;
+}
+
+.hub-router-heading h2 {
+  font-size: clamp(1.75rem, 4vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--hub-router-text);
+  margin: 0;
+}
+
+.hub-router-heading h3 {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--hub-router-text);
+  margin: 0;
+}
+
+.hub-router-heading p:not(.hub-router-eyebrow) {
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--hub-router-text-muted);
+  max-width: 44rem;
+  margin: 0;
+}
+
+/* ── Carousel container ── */
+.hub-router-carousel {
+  display: flex;
+  gap: var(--hub-router-card-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-inline: 20px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hub-router-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Card base ── */
+.hub-router-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+  background: var(--hub-router-card-bg);
+  border-radius: var(--hub-router-card-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 460px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hub-router-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark / featured card variant */
+.hub-router-card--dark {
+  background: var(--hub-router-card-dark-bg);
+  flex: 0 0 360px;
+}
+
+.hub-router-card--dark:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Card header ── */
+.hub-router-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--hub-router-card-padding);
+  min-height: 56px;
+}
+
+.hub-router-card-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.hub-router-card-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
+
+.hub-router-card-label {
+  flex: 1;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--hub-router-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hub-router-card-label p {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  white-space: inherit;
+  overflow: inherit;
+  text-overflow: inherit;
+}
+
+.hub-router-card--dark .hub-router-card-label {
+  color: #ffffff;
+}
+
+/* Arrow chevron */
+.hub-router-card-arrow {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-inline-end: 1.5px solid currentColor;
+  border-block-start: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  color: var(--hub-router-text);
+}
+
+.hub-router-card--dark .hub-router-card-arrow {
+  color: #ffffff;
+}
+
+/* ── Card media ── */
+.hub-router-card-media {
+  flex: 1;
+  overflow: hidden;
+  min-block-size: 180px;
+  background: #e8e8e8;
+}
+
+.hub-router-card--dark .hub-router-card-media {
+  background: #1a1a1a;
+}
+
+.hub-router-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hub-router-card-media picture {
+  display: block;
+  height: 100%;
+}
+
+/* ── Card content ── */
+.hub-router-card-content {
+  padding: var(--hub-router-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hub-router-card-content h2,
+.hub-router-card-content h3,
+.hub-router-card-content h4 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--hub-router-text);
+  margin: 0;
+}
+
+.hub-router-card--dark .hub-router-card-content h2,
+.hub-router-card--dark .hub-router-card-content h3,
+.hub-router-card--dark .hub-router-card-content h4 {
+  color: #ffffff;
+}
+
+.hub-router-card-content p {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--hub-router-text-muted);
+  margin: 0;
+}
+
+.hub-router-card--dark .hub-router-card-content p {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ── Card actions (CTA links) ── */
+.hub-router-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 8px;
+}
+
+.hub-router-card-actions a {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--hub-router-accent);
+  text-decoration: none;
+}
+
+.hub-router-card-actions a:hover {
+  text-decoration: underline;
+}
+
+.hub-router-card--dark .hub-router-card-actions a {
+  color: #ffffff;
+}
+
+/* ── Tablet (768px+) ── */
+@media (width >= 768px) {
+  .hub-router {
+    padding-block: 64px;
+  }
+
+  .hub-router-heading {
+    margin-block-end: 56px;
+    padding-inline: 48px;
+  }
+
+  .hub-router-heading p:not(.hub-router-eyebrow) {
+    font-size: 1.25rem;
+  }
+
+  .hub-router-carousel {
+    padding-inline: 48px;
+  }
+
+  .hub-router-card {
+    flex: 0 0 280px;
+    min-block-size: 500px;
+  }
+
+  .hub-router-card--dark {
+    flex: 0 0 400px;
+  }
+}
+
+/* ── Desktop (1280px+) ── */
+@media (width >= 1280px) {
+  .hub-router {
+    padding-block: 80px;
+  }
+
+  .hub-router-heading {
+    margin-block-end: 64px;
+    padding-inline: 109px;
+  }
+
+  .hub-router-heading p:not(.hub-router-eyebrow) {
+    font-size: 1.25rem;
+  }
+
+  .hub-router-carousel {
+    overflow-x: visible;
+    max-width: 1702px;
+    margin-inline: auto;
+    padding-inline: 109px;
+  }
+
+  .hub-router-card {
+    flex: 1 1 0;
+    min-block-size: 576px;
+  }
+
+  /* Featured dark card is ~1.7x wider than a regular card (496/294 ≈ 1.69) */
+  .hub-router-card--dark {
+    flex: 1.69 1.69 0;
+  }
+}
+
+/* ── XL (1440px+) ── */
+@media (width >= 1440px) {
+  .hub-router-carousel {
+    padding-inline: 0;
+  }
+}
