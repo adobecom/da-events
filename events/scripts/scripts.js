@@ -234,7 +234,8 @@ decorateArea();
  */
 
 (function loadStyles() {
-  const paths = [`${LIBS}/styles/styles.css`];
+  const stylesPrefix = getMetadata('foundation') === 'c2' ? '/c2' : '';
+  const paths = [`${LIBS}${stylesPrefix}/styles/styles.css`];
   if (STYLES) { paths.push(STYLES); }
   paths.forEach((path) => {
     const link = document.createElement('link');
