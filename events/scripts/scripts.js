@@ -26,6 +26,7 @@ const [{
   loadLana,
   getLocale,
   getConfig,
+  loadIms,
 }, {
   setEventConfig,
   decorateEvent,
@@ -220,6 +221,10 @@ const CONFIG = {
 
 const MILO_CONFIG = setConfig({ ...CONFIG });
 setEventConfig(E_CONFIG, MILO_CONFIG);
+
+// Kick off IMS as early as possible so credentials are ready sooner;
+// loadIms() memoizes internally so later calls (gnav, martech) reuse this same promise.
+loadIms().catch(() => {});
 
 replaceDotMedia(document);
 
