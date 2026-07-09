@@ -32,6 +32,7 @@ const [{
   getSusiOptions,
   getMetadata,
   EVENT_BLOCKS,
+  EVENT_BLOCKS_C2,
   processAutoBlockLinks,
 }] = await Promise.all([
   import(`${LIBS}/utils/utils.js`),
@@ -81,6 +82,8 @@ const prodDomains = ['milo.adobe.com', 'business.adobe.com', 'www.adobe.com', 'n
 
 // Add project-wide style path here.
 const STYLES = '';
+
+const IS_C2 = getMetadata('foundation') === 'c2';
 
 // Add any config options.
 const CONFIG = {
@@ -212,10 +215,12 @@ const CONFIG = {
   },
   signInContext: getSusiOptions(),
   externalLibs: [
-    {
-      base: EVENT_LIBS,
-      blocks: EVENT_BLOCKS_OVERRIDE.length ? EVENT_BLOCKS_OVERRIDE : EVENT_BLOCKS,
-    },
+    IS_C2
+      ? { base: `${EVENT_LIBS}/c2`, blocks: EVENT_BLOCKS_C2 }
+      : {
+        base: EVENT_LIBS,
+        blocks: EVENT_BLOCKS_OVERRIDE.length ? EVENT_BLOCKS_OVERRIDE : EVENT_BLOCKS,
+      },
     // Add more in order of precedence (first match wins):
   ],
 };
@@ -236,7 +241,8 @@ decorateArea();
  */
 
 (function loadStyles() {
-  const paths = [`${LIBS}/styles/styles.css`];
+  const stylesPrefix = IS_C2 ? '/c2' : '';
+  const paths = [`${LIBS}${stylesPrefix}/styles/styles.css`];
   if (STYLES) { paths.push(STYLES); }
   paths.forEach((path) => {
     const link = document.createElement('link');
