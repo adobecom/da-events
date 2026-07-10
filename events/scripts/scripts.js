@@ -92,7 +92,7 @@ const CONFIG = {
     africa: ['gh', 'ke', 'mu', 'tz'],
     la: ['bo', 'cr', 'do', 'ec', 'gt', 'pa', 'pr', 'py', 'sv', 'uy', 've'],
     mena_en: ['bh', 'dz', 'iq', 'ir', 'jo', 'lb', 'ly', 'om', 'ps', 'sy', 'tn', 'ye'],
-    cis_en: ['ge', 'kz', 'kg', 'md', 'tj', 'tm', 'uz'],
+    cis_en: ['am', 'az', 'ge', 'kz', 'kg', 'md', 'tj', 'tm', 'uz'],
   },
   miloLibs: LIBS,
   prodDomains,
