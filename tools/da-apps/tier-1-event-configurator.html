@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tier 1 Event Configurator</title>
+  <!--
+    ESP env override for testing. `?espenv=`/`?eccEnv=` query params on the
+    parent da.live URL never reach this iframe — DA's SDK only forwards
+    context.ref — so getEventServiceEnv() (event-libs/v1/utils/utils.js)
+    falls back to this metadata tag instead. Uncomment and set to one of:
+    dev, dev02, stage, stage02, prod, local (see ENV_MAP in
+    event-libs/v1/utils/constances.js). Defaults to prod when absent/commented
+    — MUST stay commented out (or removed) before this reaches main, so real
+    production use always defaults to prod.
+  -->
+  <meta name="event-service-env" content="local" />
 </head>
 <body>
   <div id="app"></div>
