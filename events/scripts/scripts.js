@@ -14,6 +14,7 @@ import {
   LIBS,
   EVENT_LIBS,
 } from './utils.js';
+import { preloadRegistrationStatus } from './registration-cache.js';
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
@@ -26,6 +27,9 @@ const [{
   loadLana,
   getLocale,
   getConfig,
+  loadIms,
+  getMepEnablement,
+  isSignedOut,
 }, {
   setEventConfig,
   decorateEvent,
@@ -227,6 +231,23 @@ const CONFIG = {
 
 const MILO_CONFIG = setConfig({ ...CONFIG });
 setEventConfig(E_CONFIG, MILO_CONFIG);
+
+// Kick off IMS as early as possible. loadIms() memoizes internally, so this
+// is the same promise the registration preload below - and anything else
+// that later calls loadIms() (MEP, GNAV, martech) - reuses, instead of
+// starting IMS cold whenever it happens to get around to it.
+loadIms().catch(() => {});
+
+// Preload registration status ASAP rather than waiting for MEP's own lazy
+// addon loading to get around to it - the RainFocus call takes >=1s, and MEP
+// normally blocks personalized rendering on it. See registration-cache.js
+// for why this deliberately mimics MEP's own addon logic instead of calling
+// into it. Fire-and-forget: never blocks decorateArea/loadPage below.
+const eventCode = getMepEnablement('event-code');
+if (eventCode) {
+  preloadRegistrationStatus(eventCode, { isSignedOut, getMepEnablement, getConfig })
+    .catch(() => {});
+}
 
 replaceDotMedia(document);
 
