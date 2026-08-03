@@ -65,11 +65,8 @@ function clearRegisteredFlag(eventCode) {
   document.cookie = `${REDIRECT_COOKIE(eventCode)}=; Max-Age=0; path=/; domain=.adobe.com`;
 }
 
-async function getUserId(isSignedOut, getMepEnablement) {
-  const signedInEnable = getMepEnablement('signedIn') || getMepEnablement('signedin');
-  if (isSignedOut() && !signedInEnable) return false;
-  const userIdEnable = getMepEnablement('userId') || getMepEnablement('userid');
-  if (userIdEnable && userIdEnable !== 'undefined') return userIdEnable;
+async function getUserId(isSignedOut) {
+  if (isSignedOut()) return false;
   try {
     const { userId } = await window.adobeIMS.getProfile();
     return userId;
@@ -85,11 +82,8 @@ async function getUserId(isSignedOut, getMepEnablement) {
  * already have been kicked off (and ideally resolved) by the caller; this
  * assumes window.adobeIMS is ready by the time it needs a profile/token.
  */
-export async function fetchRegistrationStatus(
-  eventCode,
-  { isSignedOut, getMepEnablement, getConfig },
-) {
-  const userId = await getUserId(isSignedOut, getMepEnablement);
+export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfig }) {
+  const userId = await getUserId(isSignedOut);
   if (!userId) return DEFAULT_RESULT;
 
   if (justRegistered(eventCode)) {

@@ -60,7 +60,6 @@ describe('registration-cache', () => {
   describe('fetchRegistrationStatus', () => {
     const deps = {
       isSignedOut: () => false,
-      getMepEnablement: () => undefined,
       getConfig: () => ({ env: { name: 'stage' } }),
     };
 
@@ -151,7 +150,6 @@ describe('registration-cache', () => {
 
       const deps = {
         isSignedOut: () => false,
-        getMepEnablement: () => undefined,
         getConfig: () => ({ env: { name: 'stage' } }),
       };
       const [result, eventDetail] = await Promise.all([
