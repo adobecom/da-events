@@ -66,7 +66,13 @@ function clearRegisteredFlag(eventCode) {
 }
 
 async function getUserId(isSignedOut) {
-  if (isSignedOut()) return false;
+  // isSignedOut() reads a `sis` Server-Timing header set by the prod edge -
+  // it's unconditionally "signed out" on preview/draft domains (.aem.page,
+  // .aem.live) where that header is never set. Fall back to IMS's own
+  // signed-in check so this is testable on preview domains too.
+  // TEMPORARY for testing - revisit once isSignedInUser()'s readiness/race
+  // behavior at this point in the load sequence is understood.
+  if (isSignedOut() && !window.adobeIMS?.isSignedInUser()) return false;
   try {
     const { userId } = await window.adobeIMS.getProfile();
     return userId;
