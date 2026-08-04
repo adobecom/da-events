@@ -14,7 +14,7 @@ import {
   LIBS,
   EVENT_LIBS,
 } from './utils.js';
-import { preloadRegistrationStatus } from './registration-cache.js';
+import { exposeRegistrationStatus } from './registration-cache.js';
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
@@ -245,10 +245,13 @@ loadIms().catch(() => {});
 // normally blocks personalized rendering on it. See registration-cache.js
 // for why this deliberately mimics MEP's own addon logic instead of calling
 // into it. Fire-and-forget: never blocks decorateArea/loadPage below.
+//
+// Also exposes window.events.getRegistrationStatus() for consumers (e.g.
+// GNAV) that load after 'registration:resolved' has already fired and so
+// can't rely on the event alone - see exposeRegistrationStatus.
 const eventCode = getMepEnablement('event-code');
 if (eventCode) {
-  preloadRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms })
-    .catch(() => {});
+  exposeRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms });
 }
 
 replaceDotMedia(document);
