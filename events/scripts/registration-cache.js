@@ -65,14 +65,20 @@ function clearRegisteredFlag(eventCode) {
   document.cookie = `${REDIRECT_COOKIE(eventCode)}=; Max-Age=0; path=/; domain=.adobe.com`;
 }
 
-async function getUserId(isSignedOut) {
+async function getUserId(isSignedOut, loadIms) {
   // isSignedOut() reads a `sis` Server-Timing header set by the prod edge -
   // it's unconditionally "signed out" on preview/draft domains (.aem.page,
   // .aem.live) where that header is never set. Fall back to IMS's own
-  // signed-in check so this is testable on preview domains too.
+  // signed-in check so this is testable on preview domains too - but IMS
+  // may not have loaded yet at this point, so wait for it (loadIms()
+  // memoizes, so this reuses whatever load scripts.js already kicked off
+  // rather than starting a second one) before trusting isSignedInUser().
   // TEMPORARY for testing - revisit once isSignedInUser()'s readiness/race
   // behavior at this point in the load sequence is understood.
-  if (isSignedOut() && !window.adobeIMS?.isSignedInUser()) return false;
+  if (isSignedOut()) {
+    await loadIms().catch(() => {});
+    if (!window.adobeIMS?.isSignedInUser()) return false;
+  }
   try {
     const { userId } = await window.adobeIMS.getProfile();
     return userId;
@@ -88,8 +94,8 @@ async function getUserId(isSignedOut) {
  * already have been kicked off (and ideally resolved) by the caller; this
  * assumes window.adobeIMS is ready by the time it needs a profile/token.
  */
-export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfig }) {
-  const userId = await getUserId(isSignedOut);
+export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms }) {
+  const userId = await getUserId(isSignedOut, loadIms);
   if (!userId) return DEFAULT_RESULT;
 
   if (justRegistered(eventCode)) {

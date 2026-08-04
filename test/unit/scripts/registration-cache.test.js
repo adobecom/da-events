@@ -61,6 +61,7 @@ describe('registration-cache', () => {
     const deps = {
       isSignedOut: () => false,
       getConfig: () => ({ env: { name: 'stage' } }),
+      loadIms: async () => {},
     };
 
     it('returns not-registered without calling the API when signed out', async () => {
@@ -68,6 +69,25 @@ describe('registration-cache', () => {
       const signedOutDeps = { ...deps, isSignedOut: () => true };
       const result = await fetchRegistrationStatus(EVENT_CODE, signedOutDeps);
       expect(result).to.deep.equal({ isRegistered: false });
+    });
+
+    it('waits for loadIms() then trusts isSignedInUser() when the sis header says signed out (preview domains)', async () => {
+      window.adobeIMS = {
+        getProfile: async () => ({ userId: USER_ID }),
+        getAccessToken: () => ({ token: 'abc' }),
+        isSignedInUser: () => true,
+      };
+      window.fetch = async () => ({ ok: true, json: async () => ({ isRegistered: true }) });
+
+      let loadImsCalled = false;
+      const previewDeps = {
+        ...deps,
+        isSignedOut: () => true,
+        loadIms: async () => { loadImsCalled = true; },
+      };
+      const result = await fetchRegistrationStatus(EVENT_CODE, previewDeps);
+      expect(loadImsCalled).to.equal(true);
+      expect(result.isRegistered).to.equal(true);
     });
 
     it('trusts the redirect cookie without calling the API, and caches it', async () => {

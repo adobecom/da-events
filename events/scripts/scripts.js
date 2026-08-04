@@ -247,7 +247,7 @@ loadIms().catch(() => {});
 // into it. Fire-and-forget: never blocks decorateArea/loadPage below.
 const eventCode = getMepEnablement('event-code');
 if (eventCode) {
-  preloadRegistrationStatus(eventCode, { isSignedOut, getConfig })
+  preloadRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms })
     .catch(() => {});
 }
 
