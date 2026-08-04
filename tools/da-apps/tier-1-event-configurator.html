@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tier 1 Event Configurator</title>
+  <!--
+    ESP env override for testing — superseded 2026-07-24 by the app's own
+    in-UI environment picker (ManualEventLookup.js, backed by
+    setEventServiceEnvOverride() in event-libs/v1/utils/utils.js). That
+    picker persists for the whole session and shows a loud banner whenever
+    it's not prod, unlike this tag, which forced the same env for everyone
+    with no visible indication it was active. Leave commented out; only
+    uncomment for a scenario the in-app picker can't reach (e.g. before the
+    app itself has mounted). Valid values: dev, dev02, stage, stage02, prod,
+    local (see ENV_MAP in event-libs/v1/utils/constances.js). Defaults to
+    prod when absent/commented — MUST stay commented out (or removed)
+    before this reaches main, so real production use always defaults to
+    prod.
+  -->
+  <!-- <meta name="event-service-env" content="local" /> -->
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    // Pick the event-libs branch to load the app code from, driven by the DA
+    // content ref. The app runs inside a da.live iframe and gets `context`
+    // (incl. ref) via the DA SDK postMessage handshake — the reliable source
+    // (arbitrary URL query params are not guaranteed to reach the iframe).
+    //
+    // context.ref maps 1:1 to the event-libs branch of the same name: main/
+    // stage/dev for shared envs, or a feature branch pushed to BOTH repos.
+    // Falls back to main. The chosen event-libs branch must contain the
+    // tier-1-event-configurator code.
+    const { default: DA_SDK } = await import('https://da.live/nx/utils/sdk.js');
+    const { context } = await DA_SDK;
+
+    const branch = context?.ref || 'main';
+    const base = `https://${branch}--event-libs--adobecom.aem.live/event-libs/tier-1-event-configurator`;
+
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = `${base}/tier-1-event-configurator.css`;
+    document.head.appendChild(css);
+
+    await import(`${base}/tier-1-event-configurator.js`);
+  </script>
+</body>
+</html>
