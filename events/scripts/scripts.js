@@ -254,7 +254,11 @@ decorateArea();
 
 async function loadPage() {
   await loadLana({ clientId: 'events-milo' });
-  await loadArea();
+  try {
+    await loadArea();
+  } catch (e) {
+    window.lana?.log(`Error in loadArea():\n${JSON.stringify(e, null, 2)}`);
+  }
   const { eventsDelayedActions } = await import(`${EVENT_LIBS}/libs.js`);
   eventsDelayedActions();
 }
