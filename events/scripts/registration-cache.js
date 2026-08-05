@@ -39,9 +39,14 @@ export function readCache(eventCode, userId) {
 export function writeCache(eventCode, userId, data) {
   try {
     const ttl = data.isRegistered ? TTL_REGISTERED_MS : TTL_UNREGISTERED_MS;
+    // inPersonAttendee is left out (JSON.stringify drops undefined values)
+    // rather than defaulted to false when the caller doesn't actually know
+    // it - e.g. the redirect-cookie fast path below only confirms
+    // isRegistered, it carries no attendee-type info, so asserting false
+    // there would cache a potentially wrong value for up to TTL_REGISTERED_MS.
     window.localStorage.setItem(cacheKey(eventCode, userId), JSON.stringify({
       isRegistered: !!data.isRegistered,
-      inPersonAttendee: !!data.inPersonAttendee,
+      inPersonAttendee: data.inPersonAttendee === undefined ? undefined : !!data.inPersonAttendee,
       exp: Date.now() + ttl,
     }));
   } catch {
@@ -96,6 +101,36 @@ function clearRegisteredFlag(eventCode) {
   document.cookie = `${REDIRECT_COOKIE(eventCode)}=; Max-Age=0; path=/; domain=.adobe.com`;
 }
 
+// Mirrors the legacy AEM globalnav "Event" component's own event-origin
+// cookie write (hawks repo:
+// app/jcr_root/apps/globalnav/clientlibs/base/event/src/js/event.js). VEAL's
+// post-reg-redirector-generic action reads this cookie to know which page to
+// send the user back to after they complete registration on RainFocus -
+// without it, VEAL falls back to that event's hardcoded
+// redirectCookieDefaultValue instead of the actual page the user was on.
+// That legacy component only runs on old AEM globalnav pages, not here, so
+// this page has to set it itself.
+//
+// Note: VEAL's events-config.json uses the literal name "event-origin" for
+// every event today (not scoped per event-code), so a user with two
+// different events open in separate tabs will have whichever tab writes
+// this cookie last "win" for both - a pre-existing limitation inherited
+// from the legacy system, not something new introduced here.
+const ORIGIN_COOKIE_NAME = 'event-origin';
+const ORIGIN_COOKIE_TTL_DAYS = 7;
+
+export function setEventOriginCookie() {
+  const expires = new Date();
+  expires.setDate(expires.getDate() + ORIGIN_COOKIE_TTL_DAYS);
+  document.cookie = [
+    `${ORIGIN_COOKIE_NAME}=${encodeURIComponent(window.location.href)}`,
+    `expires=${expires.toUTCString()}`,
+    'domain=.adobe.com',
+    'path=/',
+    'secure',
+  ].join('; ');
+}
+
 async function getUserId(isSignedOut, loadIms) {
   // isSignedOut() reads a `sis` Server-Timing header set by the prod edge -
   // it's unconditionally "signed out" on preview/draft domains (.aem.page,
@@ -115,6 +150,48 @@ async function getUserId(isSignedOut, loadIms) {
     return userId;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Calls RainFocus for the live status + auth details and writes authToken/
+ * userKey to sessionStorage. Returns null (never throws) if there's no
+ * access token yet, or the call fails/errors - callers decide their own
+ * fallback. Deliberately does NOT touch the localStorage status cache -
+ * callers that want that written decide it themselves, since "should this
+ * overwrite the existing entry/TTL" differs by caller (see call sites).
+ */
+async function fetchAndCacheAuth(eventCode, userId, getConfig) {
+  const accessToken = window.adobeIMS.getAccessToken()?.token;
+  if (!accessToken) return null;
+
+  const domainSuffix = getConfig()?.env?.name === 'prod' ? '' : '.stage';
+  const url = `https://www${domainSuffix}.adobe.com/events/api/rf-auth-seq-generic/${eventCode}?user_id=${encodeURIComponent(userId)}`;
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: 'same-origin',
+    });
+    if (!response.ok) {
+      window.lana?.log(`Unable to fetch registration status: ${response.statusText}`, {
+        tags: 'registration-cache-preload',
+        severity: 'error',
+      });
+      return null;
+    }
+    // RainFocus returns {} (not { isRegistered: false }) when not registered.
+    const {
+      authToken, userKey, ...status
+    } = { isRegistered: false, ...(await response.json()) };
+    writeAuthCache(eventCode, userId, { authToken, userKey });
+    return { status, authToken, userKey };
+  } catch (e) {
+    window.lana?.log(`Unable to fetch registration status: ${e.toString()}`, {
+      tags: 'registration-cache-preload',
+      severity: 'error',
+    });
+    return null;
   }
 }
 
@@ -141,6 +218,13 @@ export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfi
     clearRegisteredFlag(eventCode);
     const data = { isRegistered: true };
     writeCache(eventCode, userId, data);
+    // The redirect cookie only confirms isRegistered - it carries no
+    // authToken/userKey, and no attendee-type info (writeCache above
+    // correctly leaves inPersonAttendee unset rather than guessing false).
+    // Fire-and-forget: warm the auth cache in the background so authToken/
+    // userKey are available moments later on this same page view, without
+    // making this fast isRegistered:true return wait on RF.
+    fetchAndCacheAuth(eventCode, userId, getConfig).catch(() => {});
     return data;
   }
 
@@ -148,42 +232,14 @@ export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfi
   const cachedAuth = readAuthCache(eventCode, userId);
   if (cachedStatus && cachedAuth) return { ...cachedStatus, ...cachedAuth };
 
-  const accessToken = window.adobeIMS.getAccessToken()?.token;
-  if (!accessToken) return cachedStatus || DEFAULT_RESULT;
+  const auth = await fetchAndCacheAuth(eventCode, userId, getConfig);
+  if (!auth) return cachedStatus || DEFAULT_RESULT;
 
-  const domainSuffix = getConfig()?.env?.name === 'prod' ? '' : '.stage';
-  const url = `https://www${domainSuffix}.adobe.com/events/api/rf-auth-seq-generic/${eventCode}?user_id=${encodeURIComponent(userId)}`;
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${accessToken}` },
-      credentials: 'same-origin',
-    });
-    if (response.ok) {
-      // RainFocus returns {} (not { isRegistered: false }) when not registered.
-      const {
-        authToken, userKey, ...status
-      } = { isRegistered: false, ...(await response.json()) };
+  // A new tab arriving here already has a valid cachedStatus and only
+  // needed authToken/userKey - don't reset the existing entry's TTL.
+  if (!cachedStatus) writeCache(eventCode, userId, auth.status);
 
-      // A new tab arriving here already has a valid cachedStatus and only
-      // needs authToken/userKey - don't reset the existing entry's TTL.
-      if (!cachedStatus) writeCache(eventCode, userId, status);
-      writeAuthCache(eventCode, userId, { authToken, userKey });
-
-      return { ...status, authToken, userKey };
-    }
-    window.lana?.log(`Unable to fetch registration status: ${response.statusText}`, {
-      tags: 'registration-cache-preload',
-      severity: 'error',
-    });
-    return cachedStatus || DEFAULT_RESULT;
-  } catch (e) {
-    window.lana?.log(`Unable to fetch registration status: ${e.toString()}`, {
-      tags: 'registration-cache-preload',
-      severity: 'error',
-    });
-    return cachedStatus || DEFAULT_RESULT;
-  }
+  return { ...auth.status, authToken: auth.authToken, userKey: auth.userKey };
 }
 
 /**

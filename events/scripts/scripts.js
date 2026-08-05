@@ -14,7 +14,7 @@ import {
   LIBS,
   EVENT_LIBS,
 } from './utils.js';
-import { exposeRegistrationStatus } from './registration-cache.js';
+import { exposeRegistrationStatus, setEventOriginCookie } from './registration-cache.js';
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
@@ -28,7 +28,6 @@ const [{
   getLocale,
   getConfig,
   loadIms,
-  getMepEnablement,
   isSignedOut,
 }, {
   setEventConfig,
@@ -249,8 +248,12 @@ loadIms().catch(() => {});
 // Also exposes window.events.getRegistrationStatus() for consumers (e.g.
 // GNAV) that load after 'registration:resolved' has already fired and so
 // can't rely on the event alone - see exposeRegistrationStatus.
-const eventCode = getMepEnablement('event-code');
+const eventCode = getMetadata('event-code');
 if (eventCode) {
+  // Set as soon as we know this is an event page, so that whichever page the
+  // user is on when they click Register is what VEAL redirects them back to
+  // afterwards - see setEventOriginCookie for why this is needed here.
+  setEventOriginCookie();
   exposeRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms });
 }
 

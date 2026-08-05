@@ -76,6 +76,16 @@ Use this if you need to make your own authenticated call to an RF endpoint
 (e.g. checking whether a specific session is favorited). `authToken`/
 `userKey` are real credentials - only request this if you actually need them.
 
+**One landing-page nuance:** right after a user completes registration and
+gets redirected back (the `feds_<eventCode>_registeredByRedirect` fast
+path), `isRegistered` is `true` immediately, but `inPersonAttendee` may be
+`undefined` (the redirect cookie only confirms registration, not attendee
+type) and `authToken`/`userKey` may briefly be missing too (a background
+call fills them in moments later, without delaying the fast path above).
+Both self-correct on the next reload or in a new tab. If your code runs on
+that exact landing page and needs those fields, treat their absence as "not
+yet known" rather than "false"/"not registered".
+
 ### `registration:resolved` window event
 
 ```js

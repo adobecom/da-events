@@ -9,6 +9,7 @@ import {
   fetchRegistrationStatus,
   preloadRegistrationStatus,
   exposeRegistrationStatus,
+  setEventOriginCookie,
 } from '../../../events/scripts/registration-cache.js';
 
 const EVENT_CODE = 'max2025';
@@ -61,6 +62,13 @@ describe('registration-cache', () => {
       expect(() => writeCache(EVENT_CODE, USER_ID, { isRegistered: true })).to.not.throw();
       window.localStorage.setItem = original;
     });
+
+    it('leaves inPersonAttendee unset rather than defaulting it to false when the caller does not know it', () => {
+      writeCache(EVENT_CODE, USER_ID, { isRegistered: true });
+      const raw = JSON.parse(localStorage.getItem(cacheKey(EVENT_CODE, USER_ID)));
+      expect('inPersonAttendee' in raw).to.equal(false);
+      expect(readCache(EVENT_CODE, USER_ID).inPersonAttendee).to.equal(undefined);
+    });
   });
 
   describe('auth cache (sessionStorage: authToken/userKey)', () => {
@@ -93,6 +101,39 @@ describe('registration-cache', () => {
       expect(() => writeAuthCache(EVENT_CODE, USER_ID, { authToken: 'x', userKey: 'y' }))
         .to.not.throw();
       window.sessionStorage.setItem = original;
+    });
+  });
+
+  describe('setEventOriginCookie', () => {
+    // domain=.adobe.com means the browser silently refuses to persist this
+    // cookie from a non-adobe.com host (like the localhost this test runs
+    // on) - same limitation as clearRegisteredFlag above. Spy on the
+    // document.cookie setter instead of relying on the real cookie jar, so
+    // this is testable without a live .adobe.com page.
+    it('writes an event-origin cookie for the current URL, scoped to .adobe.com, URL-encoded', () => {
+      const writes = [];
+      const descriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+      Object.defineProperty(document, 'cookie', {
+        configurable: true,
+        set(value) { writes.push(value); },
+        get() { return descriptor.get.call(document); },
+      });
+
+      try {
+        setEventOriginCookie();
+      } finally {
+        // This defined an own property directly on `document`, shadowing
+        // Document.prototype's accessor - delete it to remove the shadow,
+        // rather than redefining the (untouched) prototype.
+        delete document.cookie;
+      }
+
+      expect(writes.length).to.equal(1);
+      expect(writes[0]).to.include(`event-origin=${encodeURIComponent(window.location.href)}`);
+      expect(writes[0]).to.include('domain=.adobe.com');
+      expect(writes[0]).to.include('path=/');
+      expect(writes[0]).to.include('secure');
+      expect(writes[0]).to.match(/expires=/);
     });
   });
 
@@ -130,6 +171,9 @@ describe('registration-cache', () => {
     });
 
     it('trusts the redirect cookie without calling the API, and caches it', async () => {
+      // No getAccessToken here, so the background auth-warming call below
+      // bails out before ever reaching fetch - this only holds because of
+      // that, not because the redirect-cookie path avoids the call itself.
       window.adobeIMS = { getProfile: async () => ({ userId: USER_ID }) };
       setCookie(`feds_${EVENT_CODE}_registeredByRedirect=true`);
       window.fetch = () => { throw new Error('fetch should not be called'); };
@@ -137,6 +181,47 @@ describe('registration-cache', () => {
       const result = await fetchRegistrationStatus(EVENT_CODE, deps);
       expect(result.isRegistered).to.equal(true);
       expect(readCache(EVENT_CODE, USER_ID).isRegistered).to.equal(true);
+    });
+
+    it('does not cache a guessed inPersonAttendee value on the redirect-cookie fast path', async () => {
+      window.adobeIMS = { getProfile: async () => ({ userId: USER_ID }) };
+      setCookie(`feds_${EVENT_CODE}_registeredByRedirect=true`);
+      window.fetch = () => { throw new Error('fetch should not be called'); };
+
+      await fetchRegistrationStatus(EVENT_CODE, deps);
+      expect(readCache(EVENT_CODE, USER_ID).inPersonAttendee).to.equal(undefined);
+    });
+
+    it('fires a background call to warm the auth cache on the redirect-cookie fast path, without delaying the isRegistered return', async () => {
+      window.adobeIMS = {
+        getProfile: async () => ({ userId: USER_ID }),
+        getAccessToken: () => ({ token: 'abc' }),
+      };
+      setCookie(`feds_${EVENT_CODE}_registeredByRedirect=true`);
+
+      let resolveFetch;
+      const fetchStarted = new Promise((resolve) => {
+        window.fetch = async () => {
+          resolve();
+          return new Promise((res) => { resolveFetch = res; });
+        };
+      });
+
+      const result = await fetchRegistrationStatus(EVENT_CODE, deps);
+      // The fast path already returned - auth isn't cached yet.
+      expect(result).to.deep.equal({ isRegistered: true });
+      expect(readAuthCache(EVENT_CODE, USER_ID)).to.equal(null);
+
+      // The background call was kicked off regardless.
+      await fetchStarted;
+      resolveFetch({ ok: true, json: async () => ({ isRegistered: true, authToken: 'tok-7', userKey: 'key-7' }) });
+      // Macrotask flush: the fire-and-forget chain (fetch -> response.json()
+      // -> destructure/write) spans multiple microtask ticks, and it's not
+      // awaited anywhere - a setTimeout(0) reliably lets all of them settle
+      // instead of guessing how many chained Promise.resolve() ticks it needs.
+      await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+      expect(readAuthCache(EVENT_CODE, USER_ID)).to.deep.equal({ authToken: 'tok-7', userKey: 'key-7' });
     });
 
     // clearRegisteredFlag sets Domain=.adobe.com, matching VEAL's own cookie -
