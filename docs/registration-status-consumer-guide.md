@@ -78,11 +78,12 @@ Use this if you need to make your own authenticated call to an RF endpoint
 
 **One landing-page nuance:** right after a user completes registration and
 gets redirected back (the `feds_<eventCode>_registeredByRedirect` fast
-path), `isRegistered` is `true` immediately, but `inPersonAttendee` may be
-`undefined` (the redirect cookie only confirms registration, not attendee
-type) and `authToken`/`userKey` may briefly be missing too (a background
-call fills them in moments later, without delaying the fast path above).
-Both self-correct on the next reload or in a new tab. If your code runs on
+path), `isRegistered` is `true` immediately, but `inPersonAttendee` may
+briefly be `undefined` (the redirect cookie only confirms registration, not
+attendee type) and `authToken`/`userKey` may briefly be missing too. A
+background call resolves moments later with the real values and patches the
+cache, without delaying the fast path above - so both fields fill in shortly
+after on their own, not just on the next reload/tab. If your code runs on
 that exact landing page and needs those fields, treat their absence as "not
 yet known" rather than "false"/"not registered".
 

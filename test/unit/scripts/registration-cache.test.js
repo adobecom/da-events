@@ -208,13 +208,20 @@ describe('registration-cache', () => {
       });
 
       const result = await fetchRegistrationStatus(EVENT_CODE, deps);
-      // The fast path already returned - auth isn't cached yet.
+      // The fast path already returned - auth isn't cached yet, and
+      // inPersonAttendee is still unknown at this exact instant.
       expect(result).to.deep.equal({ isRegistered: true });
       expect(readAuthCache(EVENT_CODE, USER_ID)).to.equal(null);
+      expect(readCache(EVENT_CODE, USER_ID).inPersonAttendee).to.equal(undefined);
 
       // The background call was kicked off regardless.
       await fetchStarted;
-      resolveFetch({ ok: true, json: async () => ({ isRegistered: true, authToken: 'tok-7', userKey: 'key-7' }) });
+      resolveFetch({
+        ok: true,
+        json: async () => ({
+          isRegistered: true, inPersonAttendee: true, authToken: 'tok-7', userKey: 'key-7',
+        }),
+      });
       // Macrotask flush: the fire-and-forget chain (fetch -> response.json()
       // -> destructure/write) spans multiple microtask ticks, and it's not
       // awaited anywhere - a setTimeout(0) reliably lets all of them settle
@@ -222,6 +229,12 @@ describe('registration-cache', () => {
       await new Promise((resolve) => { setTimeout(resolve, 0); });
 
       expect(readAuthCache(EVENT_CODE, USER_ID)).to.deep.equal({ authToken: 'tok-7', userKey: 'key-7' });
+      // Once the background call resolves with the real status, it patches
+      // the cache too - inPersonAttendee is no longer unknown.
+      expect(readCache(EVENT_CODE, USER_ID)).to.deep.equal({
+        isRegistered: true,
+        inPersonAttendee: true,
+      });
     });
 
     // clearRegisteredFlag sets Domain=.adobe.com, matching VEAL's own cookie -
@@ -247,7 +260,7 @@ describe('registration-cache', () => {
       });
     });
 
-    it('a new tab (status cached, auth not cached) still fetches for authToken/userKey without rewriting the localStorage entry', async () => {
+    it('a new tab (status cached, auth not cached) still fetches for authToken/userKey and refreshes the localStorage entry with the live status', async () => {
       window.adobeIMS = {
         getProfile: async () => ({ userId: USER_ID }),
         getAccessToken: () => ({ token: 'abc' }),
@@ -263,16 +276,13 @@ describe('registration-cache', () => {
         };
       };
 
-      const setItemCalls = [];
-      const originalSetItem = window.localStorage.setItem.bind(window.localStorage);
-      window.localStorage.setItem = (...args) => { setItemCalls.push(args); return originalSetItem(...args); };
-
       const result = await fetchRegistrationStatus(EVENT_CODE, deps);
 
-      window.localStorage.setItem = originalSetItem;
-
       expect(fetchCalled).to.equal(true);
-      expect(setItemCalls.length).to.equal(0);
+      expect(readCache(EVENT_CODE, USER_ID)).to.deep.equal({
+        isRegistered: true,
+        inPersonAttendee: true,
+      });
       expect(result).to.deep.equal({
         isRegistered: true,
         inPersonAttendee: true,

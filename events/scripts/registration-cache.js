@@ -219,12 +219,16 @@ export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfi
     const data = { isRegistered: true };
     writeCache(eventCode, userId, data);
     // The redirect cookie only confirms isRegistered - it carries no
-    // authToken/userKey, and no attendee-type info (writeCache above
-    // correctly leaves inPersonAttendee unset rather than guessing false).
-    // Fire-and-forget: warm the auth cache in the background so authToken/
-    // userKey are available moments later on this same page view, without
-    // making this fast isRegistered:true return wait on RF.
-    fetchAndCacheAuth(eventCode, userId, getConfig).catch(() => {});
+    // authToken/userKey, and no attendee-type info, so inPersonAttendee is
+    // unknown at this exact instant (writeCache above correctly leaves it
+    // unset rather than guessing false). Fire-and-forget: warm the auth
+    // cache in the background, and once that resolves with the real
+    // status, patch it into the cache too - so inPersonAttendee stops
+    // being unknown moments later, without making this fast
+    // isRegistered:true return wait on RF.
+    fetchAndCacheAuth(eventCode, userId, getConfig)
+      .then((auth) => { if (auth) writeCache(eventCode, userId, auth.status); })
+      .catch(() => {});
     return data;
   }
 
@@ -235,9 +239,11 @@ export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfi
   const auth = await fetchAndCacheAuth(eventCode, userId, getConfig);
   if (!auth) return cachedStatus || DEFAULT_RESULT;
 
-  // A new tab arriving here already has a valid cachedStatus and only
-  // needed authToken/userKey - don't reset the existing entry's TTL.
-  if (!cachedStatus) writeCache(eventCode, userId, auth.status);
+  // Always write through with the real, live status - even if a
+  // cachedStatus already existed (e.g. a new tab that only needed
+  // authToken/userKey) - so the cache never keeps serving a stale/unknown
+  // value once we actually know better.
+  writeCache(eventCode, userId, auth.status);
 
   return { ...auth.status, authToken: auth.authToken, userKey: auth.userKey };
 }
