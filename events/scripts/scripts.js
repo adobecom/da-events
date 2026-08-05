@@ -237,8 +237,6 @@ setEventConfig(E_CONFIG, MILO_CONFIG);
 // starting IMS cold whenever it happens to get around to it.
 loadIms().catch(() => {});
 
-// change
-
 // Preload registration status ASAP rather than waiting for MEP's own lazy
 // addon loading to get around to it - the RainFocus call takes >=1s, and MEP
 // normally blocks personalized rendering on it. See registration-cache.js
