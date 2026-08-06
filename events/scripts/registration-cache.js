@@ -1,22 +1,6 @@
-/*
- * Preloads and caches event registration status as early as possible,
- * independent of Milo's MEP - MEP only checks registration once its own
- * addon loading gets around to it, and the RainFocus call it depends on
- * takes >=1s minimum. For a high-traffic page we want the DOM to render
- * without waiting on that.
- *
- * This intentionally does NOT import or call MEP's own addon
- * (libs/features/mep/addons/event.js) - it mimics the same logic
- * independently, using the SAME localStorage cache key scheme MEP's addon
- * uses (mep-event:<eventCode>:<userId>, same TTLs). That way, when MEP's own
- * addon runs later as part of its normal flow, it reads the cache entry this
- * module already wrote and gets a cache hit instead of firing its own
- * RainFocus call - the two never call each other, but they still cooperate
- * through the shared cache.
- *
- * Kept as its own module (rather than inline in scripts.js) so the pure
- * cache-key/TTL logic is unit-testable without a live scripts.js bootstrap.
- */
+// Preloads registration status independently of Milo's MEP, so the page
+// doesn't block render on the RainFocus (RF) call. See
+// docs/registration-status-consumer-guide.md for consumer-facing behavior.
 
 const DEFAULT_RESULT = { isRegistered: false };
 const TTL_REGISTERED_MS = 24 * 60 * 60 * 1000;
@@ -39,26 +23,20 @@ export function readCache(eventCode, userId) {
 export function writeCache(eventCode, userId, data) {
   try {
     const ttl = data.isRegistered ? TTL_REGISTERED_MS : TTL_UNREGISTERED_MS;
-    // inPersonAttendee is left out (JSON.stringify drops undefined values)
-    // rather than defaulted to false when the caller doesn't actually know
-    // it - e.g. the redirect-cookie fast path below only confirms
-    // isRegistered, it carries no attendee-type info, so asserting false
-    // there would cache a potentially wrong value for up to TTL_REGISTERED_MS.
+    // inPersonAttendee stays unset (not defaulted false) when unknown, so we
+    // never cache a guessed value.
     window.localStorage.setItem(cacheKey(eventCode, userId), JSON.stringify({
       isRegistered: !!data.isRegistered,
       inPersonAttendee: data.inPersonAttendee === undefined ? undefined : !!data.inPersonAttendee,
       exp: Date.now() + ttl,
     }));
   } catch {
-    // storage unavailable (quota, private mode, sandboxed context) - non-fatal
+    // storage unavailable - non-fatal
   }
 }
 
-// authToken/userKey are live RF credentials, not gating flags - unlike
-// isRegistered/inPersonAttendee they deliberately do NOT go in localStorage,
-// which would leave them sitting on disk for up to TTL_REGISTERED_MS (24h).
-// sessionStorage scopes them to the current tab's lifetime instead. Same key
-// scheme as cacheKey, but a separate storage area, so no collision.
+// authToken/userKey are live RF credentials - kept in sessionStorage (tab
+// lifetime only), not localStorage, so they never persist to disk.
 export const authCacheKey = (eventCode, userId) => `mep-event-auth:${eventCode}:${userId}`;
 
 export function readAuthCache(eventCode, userId) {
@@ -81,13 +59,11 @@ export function writeAuthCache(eventCode, userId, data) {
       exp: Date.now() + TTL_REGISTERED_MS,
     }));
   } catch {
-    // storage unavailable (quota, private mode, sandboxed context) - non-fatal
+    // storage unavailable - non-fatal
   }
 }
 
-// Mirrors MEP's own redirect-cookie fast path: VEAL sets this cookie right
-// after a successful registration redirect, so we can trust "registered"
-// for the pre-render paint instead of waiting on a fresh RainFocus call.
+// VEAL sets this right after a successful registration redirect.
 const REDIRECT_COOKIE = (eventCode) => `feds_${eventCode}_registeredByRedirect`;
 
 function justRegistered(eventCode) {
@@ -97,25 +73,12 @@ function justRegistered(eventCode) {
 }
 
 function clearRegisteredFlag(eventCode) {
-  // VEAL sets this cookie Domain=.adobe.com; a host-only delete won't clear it.
+  // Domain=.adobe.com matches how VEAL set it; a host-only delete won't clear it.
   document.cookie = `${REDIRECT_COOKIE(eventCode)}=; Max-Age=0; path=/; domain=.adobe.com`;
 }
 
-// Mirrors the legacy AEM globalnav "Event" component's own event-origin
-// cookie write (hawks repo:
-// app/jcr_root/apps/globalnav/clientlibs/base/event/src/js/event.js). VEAL's
-// post-reg-redirector-generic action reads this cookie to know which page to
-// send the user back to after they complete registration on RainFocus -
-// without it, VEAL falls back to that event's hardcoded
-// redirectCookieDefaultValue instead of the actual page the user was on.
-// That legacy component only runs on old AEM globalnav pages, not here, so
-// this page has to set it itself.
-//
-// Note: VEAL's events-config.json uses the literal name "event-origin" for
-// every event today (not scoped per event-code), so a user with two
-// different events open in separate tabs will have whichever tab writes
-// this cookie last "win" for both - a pre-existing limitation inherited
-// from the legacy system, not something new introduced here.
+// Tells VEAL's post-reg-redirector-generic action which page to send the
+// user back to after registering on RainFocus.
 const ORIGIN_COOKIE_NAME = 'event-origin';
 const ORIGIN_COOKIE_TTL_DAYS = 7;
 
@@ -132,15 +95,8 @@ export function setEventOriginCookie() {
 }
 
 async function getUserId(isSignedOut, loadIms) {
-  // isSignedOut() reads a `sis` Server-Timing header set by the prod edge -
-  // it's unconditionally "signed out" on preview/draft domains (.aem.page,
-  // .aem.live) where that header is never set. Fall back to IMS's own
-  // signed-in check so this is testable on preview domains too - but IMS
-  // may not have loaded yet at this point, so wait for it (loadIms()
-  // memoizes, so this reuses whatever load scripts.js already kicked off
-  // rather than starting a second one) before trusting isSignedInUser().
-  // TEMPORARY for testing - revisit once isSignedInUser()'s readiness/race
-  // behavior at this point in the load sequence is understood.
+  // isSignedOut() is unconditionally true on preview domains (no `sis`
+  // Server-Timing header there) - fall back to IMS once it's loaded.
   if (isSignedOut()) {
     await loadIms().catch(() => {});
     if (!window.adobeIMS?.isSignedInUser()) return false;
@@ -153,14 +109,9 @@ async function getUserId(isSignedOut, loadIms) {
   }
 }
 
-/**
- * Calls RainFocus for the live status + auth details and writes authToken/
- * userKey to sessionStorage. Returns null (never throws) if there's no
- * access token yet, or the call fails/errors - callers decide their own
- * fallback. Deliberately does NOT touch the localStorage status cache -
- * callers that want that written decide it themselves, since "should this
- * overwrite the existing entry/TTL" differs by caller (see call sites).
- */
+// Fetches live status + auth from RF and writes authToken/userKey to
+// sessionStorage. Never touches the localStorage status cache - callers
+// decide whether/how to write that themselves.
 async function fetchAndCacheAuth(eventCode, userId, getConfig) {
   const accessToken = window.adobeIMS.getAccessToken()?.token;
   if (!accessToken) return null;
@@ -195,21 +146,6 @@ async function fetchAndCacheAuth(eventCode, userId, getConfig) {
   }
 }
 
-/**
- * Resolves registration status for `eventCode`, preferring the redirect-flag
- * signal, then the cache, then a live RainFocus fetch - writing through to
- * the cache on every path that determines a real result. loadIms() must
- * already have been kicked off (and ideally resolved) by the caller; this
- * assumes window.adobeIMS is ready by the time it needs a profile/token.
- *
- * isRegistered/inPersonAttendee (the gating flags MEP/GNAV need) live in
- * localStorage and are shared across tabs. authToken/userKey (live RF
- * credentials) live in sessionStorage, scoped to the current tab. A new tab
- * inherits the localStorage entry but not the sessionStorage one, so it
- * still has to make one RF call to pick up its own authToken/userKey - but
- * that call intentionally does NOT rewrite the existing localStorage
- * entry/TTL, only sessionStorage.
- */
 export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms }) {
   const userId = await getUserId(isSignedOut, loadIms);
   if (!userId) return DEFAULT_RESULT;
@@ -218,14 +154,8 @@ export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfi
     clearRegisteredFlag(eventCode);
     const data = { isRegistered: true };
     writeCache(eventCode, userId, data);
-    // The redirect cookie only confirms isRegistered - it carries no
-    // authToken/userKey, and no attendee-type info, so inPersonAttendee is
-    // unknown at this exact instant (writeCache above correctly leaves it
-    // unset rather than guessing false). Fire-and-forget: warm the auth
-    // cache in the background, and once that resolves with the real
-    // status, patch it into the cache too - so inPersonAttendee stops
-    // being unknown moments later, without making this fast
-    // isRegistered:true return wait on RF.
+    // Fire-and-forget: warm auth + patch in the real status once known,
+    // without delaying this fast isRegistered:true return.
     fetchAndCacheAuth(eventCode, userId, getConfig)
       .then((auth) => { if (auth) writeCache(eventCode, userId, auth.status); })
       .catch(() => {});
@@ -239,58 +169,24 @@ export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfi
   const auth = await fetchAndCacheAuth(eventCode, userId, getConfig);
   if (!auth) return cachedStatus || DEFAULT_RESULT;
 
-  // Always write through with the real, live status - even if a
-  // cachedStatus already existed (e.g. a new tab that only needed
-  // authToken/userKey) - so the cache never keeps serving a stale/unknown
-  // value once we actually know better.
   writeCache(eventCode, userId, auth.status);
 
   return { ...auth.status, authToken: auth.authToken, userKey: auth.userKey };
 }
 
-/**
- * Fire-and-forget entry point for scripts.js: resolves registration status
- * for `eventCode` and dispatches 'registration:resolved' on window with the
- * result, so anything else on the page that wants it can listen rather than
- * reading the cache directly. Never throws - all failure paths already
- * resolve to DEFAULT_RESULT inside fetchRegistrationStatus.
- *
- * Only the gating flags (isRegistered/inPersonAttendee) go out on the event -
- * it's a page-wide broadcast any script can listen to, so authToken/userKey
- * are deliberately left out. Code that legitimately needs the live RF
- * credentials should read them directly via readAuthCache instead.
- */
 export async function preloadRegistrationStatus(eventCode, deps) {
   const result = await fetchRegistrationStatus(eventCode, deps);
   const { isRegistered, inPersonAttendee } = result;
+  // authToken/userKey deliberately excluded - this is a page-wide broadcast.
   window.dispatchEvent(new CustomEvent('registration:resolved', {
     detail: { isRegistered, inPersonAttendee },
   }));
   return result;
 }
 
-/**
- * Exposes registration status/details on window.events, for consumers (e.g.
- * GNAV, sessionGuide) that may not have loaded yet by the time
- * 'registration:resolved' fires and so can't rely on the event alone. Both
- * getters share the SAME memoized promise underneath - only one RF call
- * happens no matter how many consumers call either one, and callers that
- * arrive after resolution get an already-resolved promise instantly.
- *
- * Neither getter resolves any faster than fetchRegistrationStatus itself: if
- * the cache wasn't already fully warm, awaiting either one blocks on the live
- * RF fetch (no timeout there today), not just "whatever's cached so far".
- *
- * - getRegistrationStatus(): isRegistered/inPersonAttendee only. This is the
- *   same shape broadcast on 'registration:resolved', for passive/broad
- *   consumption.
- * - getRegistrationDetails(): full result including authToken/userKey, for
- *   consumers that explicitly need to make their own RF-authenticated calls
- *   (e.g. sessionGuide checking favorite status). Deliberately a separate,
- *   explicit pull rather than folded into the broadcast event/getter above -
- *   an event pushes data to every listener on the page whether they asked
- *   for it or not, while this requires an explicit call.
- */
+// Exposes resolved status/details on window.events for consumers (GNAV,
+// sessionGuide, etc.) that may load after 'registration:resolved' already
+// fired. Both getters share one memoized promise - only one RF call total.
 export function exposeRegistrationStatus(eventCode, deps) {
   const detailsPromise = preloadRegistrationStatus(eventCode, deps)
     .catch(() => DEFAULT_RESULT);
@@ -298,7 +194,7 @@ export function exposeRegistrationStatus(eventCode, deps) {
     .then(({ isRegistered, inPersonAttendee }) => ({ isRegistered, inPersonAttendee }));
 
   window.events = window.events || {};
-  window.events.getRegistrationStatus = () => statusPromise;
-  window.events.getRegistrationDetails = () => detailsPromise;
+  window.events.getRegistrationStatus = () => statusPromise; // gating flags only
+  window.events.getRegistrationDetails = () => detailsPromise; // includes authToken/userKey
   return detailsPromise;
 }
