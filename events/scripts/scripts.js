@@ -231,26 +231,12 @@ const CONFIG = {
 const MILO_CONFIG = setConfig({ ...CONFIG });
 setEventConfig(E_CONFIG, MILO_CONFIG);
 
-// Kick off IMS as early as possible. loadIms() memoizes internally, so this
-// is the same promise the registration preload below - and anything else
-// that later calls loadIms() (MEP, GNAV, martech) - reuses, instead of
-// starting IMS cold whenever it happens to get around to it.
+// loadIms() memoizes internally, so downstream MEP/GNAV/martech calls reuse this promise.
 loadIms().catch(() => {});
 
-// Preload registration status ASAP rather than waiting for MEP's own lazy
-// addon loading to get around to it - the RainFocus call takes >=1s, and MEP
-// normally blocks personalized rendering on it. See registration-cache.js
-// for why this deliberately mimics MEP's own addon logic instead of calling
-// into it. Fire-and-forget: never blocks decorateArea/loadPage below.
-//
-// Also exposes window.events.getRegistrationStatus() for consumers (e.g.
-// GNAV) that load after 'registration:resolved' has already fired and so
-// can't rely on the event alone - see exposeRegistrationStatus.
+// Fire-and-forget, doesn't block decorateArea/loadPage - see registration-cache.js.
 const eventCode = getMetadata('event-code');
 if (eventCode) {
-  // Set as soon as we know this is an event page, so that whichever page the
-  // user is on when they click Register is what VEAL redirects them back to
-  // afterwards - see setEventOriginCookie for why this is needed here.
   setEventOriginCookie();
   exposeRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms });
 }
