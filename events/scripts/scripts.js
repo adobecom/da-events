@@ -244,6 +244,9 @@ decorateArea();
   const stylesPrefix = IS_C2 ? '/c2' : '';
   const paths = [`${LIBS}${stylesPrefix}/styles/styles.css`];
   if (STYLES) { paths.push(STYLES); }
+  // Page-wide C2 styles from event-libs (rounded video players, etc.) -
+  // separate from Milo's own C2 styles.css above.
+  if (IS_C2) { paths.push(`${EVENT_LIBS}/c2/styles/c2-global.css`); }
   paths.forEach((path) => {
     const link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
