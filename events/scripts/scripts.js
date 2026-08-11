@@ -14,6 +14,7 @@ import {
   LIBS,
   EVENT_LIBS,
 } from './utils.js';
+import { exposeRegistrationStatus, setEventOriginCookie } from './registration-cache.js';
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
@@ -26,6 +27,8 @@ const [{
   loadLana,
   getLocale,
   getConfig,
+  loadIms,
+  isSignedOut,
 }, {
   setEventConfig,
   decorateEvent,
@@ -227,6 +230,16 @@ const CONFIG = {
 
 const MILO_CONFIG = setConfig({ ...CONFIG });
 setEventConfig(E_CONFIG, MILO_CONFIG);
+
+// loadIms() memoizes internally, so downstream MEP/GNAV/martech calls reuse this promise.
+loadIms().catch(() => {});
+
+// Fire-and-forget, doesn't block decorateArea/loadPage - see registration-cache.js.
+const eventCode = getMetadata('event-code');
+if (eventCode) {
+  setEventOriginCookie();
+  exposeRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms });
+}
 
 replaceDotMedia(document);
 
