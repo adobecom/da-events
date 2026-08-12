@@ -81,56 +81,52 @@ describe('Scripts Functions', () => {
   });
 
   describe('decorateArea - unconditional section-columns layout', () => {
-    // Mirrors the real decorateArea in events/scripts/scripts.js: addStylesToEventPage
-    // and applySectionColumnsLayout must run unconditionally (unlike decorateEvent,
-    // which is gated on event-id), since section-layout targets static pages too.
+    // Mirrors the real decorateArea in events/scripts/scripts.js: applySectionColumnsLayout
+    // must run unconditionally (unlike decorateEvent, which is gated on event-id), since
+    // section-layout targets static pages too. It loads its own required CSS internally.
     function makeDecorateArea({
       getMetadata,
       processAutoBlockLinks,
-      addStylesToEventPage,
       applySectionColumnsLayout,
       decorateEvent,
     }) {
       return function decorateArea(area = document) {
         processAutoBlockLinks(area);
-        addStylesToEventPage();
         applySectionColumnsLayout();
         if (!getMetadata('event-id')) return;
         decorateEvent(area);
       };
     }
 
-    it('calls addStylesToEventPage and applySectionColumnsLayout even without an event-id', () => {
-      let stylesCalled = false;
+    it('calls applySectionColumnsLayout even without an event-id, and skips decorateEvent', () => {
       let layoutCalled = false;
       let decorateEventCalled = false;
       const decorateArea = makeDecorateArea({
         getMetadata: () => undefined,
         processAutoBlockLinks: () => {},
-        addStylesToEventPage: () => { stylesCalled = true; },
         applySectionColumnsLayout: () => { layoutCalled = true; },
         decorateEvent: () => { decorateEventCalled = true; },
       });
 
       decorateArea(document);
 
-      expect(stylesCalled).to.be.true;
       expect(layoutCalled).to.be.true;
       expect(decorateEventCalled).to.be.false;
     });
 
-    it('still calls decorateEvent when an event-id is present', () => {
+    it('still calls applySectionColumnsLayout and decorateEvent when an event-id is present', () => {
+      let layoutCalled = false;
       let decorateEventCalled = false;
       const decorateArea = makeDecorateArea({
         getMetadata: () => 'test-event-id',
         processAutoBlockLinks: () => {},
-        addStylesToEventPage: () => {},
-        applySectionColumnsLayout: () => {},
+        applySectionColumnsLayout: () => { layoutCalled = true; },
         decorateEvent: () => { decorateEventCalled = true; },
       });
 
       decorateArea(document);
 
+      expect(layoutCalled).to.be.true;
       expect(decorateEventCalled).to.be.true;
     });
   });

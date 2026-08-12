@@ -37,7 +37,6 @@ const [{
   EVENT_BLOCKS,
   EVENT_BLOCKS_C2,
   processAutoBlockLinks,
-  addStylesToEventPage,
   applySectionColumnsLayout,
 }] = await Promise.all([
   import(`${LIBS}/utils/utils.js`),
@@ -67,7 +66,7 @@ export default function decorateArea(area = document) {
 
   // Runs unconditionally (unlike decorateEvent below) since section-layout
   // is meant for static/non-event pages too, not just pages with an event-id.
-  addStylesToEventPage();
+  // Loads its own required CSS internally.
   applySectionColumnsLayout();
 
   if (!getMetadata('event-id')) return;
