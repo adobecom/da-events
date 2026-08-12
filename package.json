@@ -8,9 +8,10 @@
     "test": "wtr \"./test/unit/**/*.test.js\" --node-resolve --port=2000 --coverage",
     "test:watch": "npm test -- --watch",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:fix" : "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "lint:js": "eslint .",
-    "lint:css": "stylelint 'events/blocks/**/*.css' 'events/styles/*.css'"
+    "lint:css": "stylelint 'events/blocks/**/*.css' 'events/styles/*.css'",
+    "up:fg-pink": "aem up --url https://main--da-events-fg-pink--adobecom.aem.page"
   },
   "repository": {
     "type": "git",
@@ -39,7 +40,8 @@
     "sinon": "13.0.1",
     "stylelint": "14.6.0",
     "stylelint-config-prettier": "9.0.3",
-    "stylelint-config-standard": "25.0.0"
+    "stylelint-config-standard": "25.0.0",
+    "@adobe/aem-cli": "^16.19.1"
   },
   "dependencies": {
     "@adobecom/milo": "github:adobecom/milo#main"

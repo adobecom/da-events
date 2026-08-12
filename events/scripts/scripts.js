@@ -14,6 +14,7 @@ import {
   LIBS,
   EVENT_LIBS,
 } from './utils.js';
+import { exposeRegistrationStatus, setEventOriginCookie } from './registration-cache.js';
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
@@ -26,6 +27,8 @@ const [{
   loadLana,
   getLocale,
   getConfig,
+  loadIms,
+  isSignedOut,
 }, {
   setEventConfig,
   decorateEvent,
@@ -228,6 +231,16 @@ const CONFIG = {
 const MILO_CONFIG = setConfig({ ...CONFIG });
 setEventConfig(E_CONFIG, MILO_CONFIG);
 
+// loadIms() memoizes internally, so downstream MEP/GNAV/martech calls reuse this promise.
+loadIms().catch(() => {});
+
+// Fire-and-forget, doesn't block decorateArea/loadPage - see registration-cache.js.
+const eventCode = getMetadata('event-code');
+if (eventCode) {
+  setEventOriginCookie();
+  exposeRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms });
+}
+
 replaceDotMedia(document);
 
 // Decorate the page with site specific needs.
@@ -244,6 +257,9 @@ decorateArea();
   const stylesPrefix = IS_C2 ? '/c2' : '';
   const paths = [`${LIBS}${stylesPrefix}/styles/styles.css`];
   if (STYLES) { paths.push(STYLES); }
+  // Page-wide C2 styles from event-libs (rounded video players, etc.) -
+  // separate from Milo's own C2 styles.css above.
+  if (IS_C2) { paths.push(`${EVENT_LIBS}/c2/styles/c2-global.css`); }
   paths.forEach((path) => {
     const link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
