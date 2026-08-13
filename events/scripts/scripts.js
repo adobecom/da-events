@@ -102,6 +102,10 @@ const CONFIG = {
   },
   miloLibs: LIBS,
   prodDomains,
+  stageDomainsMap: {
+    'business.stage.adobe.com': { 'business.adobe.com': 'origin' },
+    'www.stage.adobe.com': { 'www.adobe.com': 'origin' },
+  },
   htmlExclude: [
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?express(\/.*)?/,
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?go(\/.*)?/,
