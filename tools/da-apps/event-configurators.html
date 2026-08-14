@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Configurators</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    // Pick the event-libs branch to load the app code from, driven by the DA
+    // content ref. The app runs inside a da.live iframe and gets `context`
+    // (incl. ref) via the DA SDK postMessage handshake — the reliable source
+    // (arbitrary URL query params are not guaranteed to reach the iframe).
+    //
+    // context.ref maps 1:1 to the event-libs branch of the same name: main/
+    // stage/dev for shared envs, or a feature branch pushed to BOTH repos.
+    // Falls back to main. The chosen event-libs branch must contain the
+    // event-configurators-shell code (and the two apps it mounts).
+    const { default: DA_SDK } = await import('https://da.live/nx/utils/sdk.js');
+    const { context } = await DA_SDK;
+
+    const branch = context?.ref || 'main';
+    const base = `https://${branch}--event-libs--adobecom.aem.live/event-libs`;
+
+    // The shell mounts each existing app's own component tree directly — every
+    // stylesheet those apps rely on has to be present too, since only the app's own
+    // <name>.js entry point (not imported here) normally loads its own CSS.
+    [
+      'event-configurators-shell/event-configurators-shell.css',
+      'tier-1-event-configurator/tier-1-event-configurator.css',
+      'session-guide-configurator/session-guide-configurator.css',
+    ].forEach((href) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = `${base}/${href}`;
+      document.head.appendChild(css);
+    });
+
+    await import(`${base}/event-configurators-shell/event-configurators-shell.js`);
+  </script>
+</body>
+</html>
