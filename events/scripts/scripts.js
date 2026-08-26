@@ -85,6 +85,8 @@ const STYLES = '';
 
 const IS_C2 = getMetadata('foundation') === 'c2';
 
+const IS_NO_FIREFLY_IMS_SCOPE = getMetadata('no-firefly-ims-scope') === 'true';
+
 // Add any config options.
 const CONFIG = {
   codeRoot: '/events',
@@ -103,7 +105,7 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?go(\/.*)?/,
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
-  // imsScope: 'AdobeID,openid,gnav',
+  ...(IS_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,firefly_api,additional_info.roles,account_cluster.read' }),
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   decorateArea,
