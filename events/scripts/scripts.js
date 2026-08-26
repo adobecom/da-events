@@ -105,7 +105,7 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?go(\/.*)?/,
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
-  ...(IS_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,firefly_api,additional_info.roles,account_cluster.read' }),
+  ...(IS_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,additional_info.roles,account_cluster.read' }),
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   decorateArea,
