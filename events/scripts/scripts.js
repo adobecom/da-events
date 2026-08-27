@@ -85,7 +85,7 @@ const STYLES = '';
 
 const IS_C2 = getMetadata('foundation') === 'c2';
 
-const IS_UNAV_NO_FIREFLY_IMS_SCOPE = getMetadata('is-unav-no-firefly-ims-scope') === 'true';
+const IS_UNAV_NO_FIREFLY_IMS_SCOPE = getMetadata('unav-no-firefly-ims-scope') === 'true';
 
 // Add any config options.
 const CONFIG = {
