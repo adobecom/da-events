@@ -142,6 +142,7 @@ describe('registration-cache', () => {
       isSignedOut: () => false,
       getConfig: () => ({ env: { name: 'stage' } }),
       loadIms: async () => {},
+      imsInstanceTimeout: 10,
     };
 
     it('returns not-registered without calling the API when signed out', async () => {
@@ -168,6 +169,41 @@ describe('registration-cache', () => {
       const result = await fetchRegistrationStatus(EVENT_CODE, previewDeps);
       expect(loadImsCalled).to.equal(true);
       expect(result.isRegistered).to.equal(true);
+    });
+
+    it('falls back to the onImsLibInstance handshake when isSignedInUser() is not yet reliable right after loadIms()', async () => {
+      let signedIn = false;
+      window.adobeIMS = {
+        getProfile: async () => ({ userId: USER_ID }),
+        getAccessToken: () => ({ token: 'abc' }),
+        isSignedInUser: () => signedIn,
+      };
+      window.fetch = async () => ({ ok: true, json: async () => ({ isRegistered: true }) });
+
+      // imslib finishes initializing shortly after loadIms() resolved -
+      // dispatch its native ready event once something starts listening.
+      window.addEventListener('getImsLibInstance', () => {
+        signedIn = true;
+        window.dispatchEvent(new CustomEvent('onImsLibInstance', { detail: { instance: {} } }));
+      }, { once: true });
+
+      const resultPromise = fetchRegistrationStatus(EVENT_CODE, {
+        ...deps,
+        isSignedOut: () => true,
+      });
+      const result = await resultPromise;
+      expect(result.isRegistered).to.equal(true);
+    });
+
+    it('gives up and treats the user as signed out if the onImsLibInstance handshake times out', async () => {
+      window.adobeIMS = { isSignedInUser: () => false };
+      window.fetch = () => { throw new Error('fetch should not be called'); };
+
+      const result = await fetchRegistrationStatus(EVENT_CODE, {
+        ...deps,
+        isSignedOut: () => true,
+      });
+      expect(result).to.deep.equal({ isRegistered: false });
     });
 
     it('trusts the redirect cookie without calling the API, and caches it', async () => {
@@ -361,6 +397,7 @@ describe('registration-cache', () => {
         isSignedOut: () => false,
         getConfig: () => ({ env: { name: 'stage' } }),
         loadIms: async () => {},
+        imsInstanceTimeout: 10,
       };
       const [result, eventDetail] = await Promise.all([
         preloadRegistrationStatus(EVENT_CODE, deps),
@@ -377,6 +414,7 @@ describe('registration-cache', () => {
       isSignedOut: () => false,
       getConfig: () => ({ env: { name: 'stage' } }),
       loadIms: async () => {},
+      imsInstanceTimeout: 10,
     };
 
     it('exposes window.events.getRegistrationStatus, resolving to the gating flags only', async () => {

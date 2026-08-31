@@ -94,11 +94,35 @@ export function setEventOriginCookie() {
   ].join('; ');
 }
 
-async function getUserId(isSignedOut, loadIms) {
+// window.adobeIMS existing doesn't mean it's actually ready - loadIms()'s
+// own promise can resolve/reject before imslib finishes initializing
+// (e.g. its 5s internal timeout). imslib itself natively answers a
+// getImsLibInstance/onImsLibInstance handshake once it's truly ready -
+// same mechanism milo's own GNAV code falls back to for this race.
+function waitForImsInstance(timeout = 3000) {
+  return new Promise((resolve, reject) => {
+    const onReady = (e) => {
+      window.removeEventListener('onImsLibInstance', onReady);
+      clearTimeout(timer);
+      if (e?.detail?.instance) resolve(e.detail.instance); else reject();
+    };
+    const timer = setTimeout(() => {
+      window.removeEventListener('onImsLibInstance', onReady);
+      reject();
+    }, timeout);
+    window.addEventListener('onImsLibInstance', onReady);
+    window.dispatchEvent(new CustomEvent('getImsLibInstance'));
+  });
+}
+
+async function getUserId(isSignedOut, loadIms, imsInstanceTimeout) {
   // isSignedOut() is unconditionally true on preview domains (no `sis`
   // Server-Timing header there) - fall back to IMS once it's loaded.
   if (isSignedOut()) {
     await loadIms().catch(() => {});
+    if (!window.adobeIMS?.isSignedInUser()) {
+      await waitForImsInstance(imsInstanceTimeout).catch(() => {});
+    }
     if (!window.adobeIMS?.isSignedInUser()) return false;
   }
   try {
@@ -146,8 +170,13 @@ async function fetchAndCacheAuth(eventCode, userId, getConfig) {
   }
 }
 
-export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms }) {
-  const userId = await getUserId(isSignedOut, loadIms);
+export async function fetchRegistrationStatus(
+  eventCode,
+  {
+    isSignedOut, getConfig, loadIms, imsInstanceTimeout,
+  },
+) {
+  const userId = await getUserId(isSignedOut, loadIms, imsInstanceTimeout);
   if (!userId) return DEFAULT_RESULT;
 
   if (justRegistered(eventCode)) {
