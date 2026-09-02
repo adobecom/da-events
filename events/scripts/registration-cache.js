@@ -94,11 +94,6 @@ export function setEventOriginCookie() {
   ].join('; ');
 }
 
-// window.adobeIMS existing doesn't mean it's actually ready - loadIms()'s
-// own promise can resolve/reject before imslib finishes initializing
-// (e.g. its 5s internal timeout). imslib itself natively answers a
-// getImsLibInstance/onImsLibInstance handshake once it's truly ready -
-// same mechanism milo's own GNAV code falls back to for this race.
 function waitForImsInstance(timeout = 3000) {
   return new Promise((resolve, reject) => {
     const onReady = (e) => {
