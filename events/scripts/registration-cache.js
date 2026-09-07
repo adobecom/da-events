@@ -121,6 +121,9 @@ async function getUserId(isSignedOut, loadIms, imsInstanceTimeout) {
     if (!window.adobeIMS?.isSignedInUser()) return false;
   }
   try {
+    if (!window.adobeIMS) {
+      await waitForImsInstance(imsInstanceTimeout).catch(() => {});
+    }
     const { userId } = await window.adobeIMS.getProfile();
     return userId;
   } catch {

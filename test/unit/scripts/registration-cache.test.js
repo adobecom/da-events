@@ -206,6 +206,41 @@ describe('registration-cache', () => {
       expect(result).to.deep.equal({ isRegistered: false });
     });
 
+    it('production fast path: waits for window.adobeIMS via the handshake when the sis header says signed in but IMS is not yet ready', async () => {
+      // isSignedOut() false (sis header says signed in) skips the loadIms()
+      // await entirely - window.adobeIMS starts out undefined here, matching
+      // a production race where the fire-and-forget loadIms() from
+      // scripts.js hasn't finished yet by the time this runs.
+      delete window.adobeIMS;
+      window.fetch = async () => ({ ok: true, json: async () => ({ isRegistered: true }) });
+
+      window.addEventListener('getImsLibInstance', () => {
+        window.adobeIMS = {
+          isSignedInUser: () => true,
+          getProfile: async () => ({ userId: USER_ID }),
+          getAccessToken: () => ({ token: 'abc' }),
+        };
+        window.dispatchEvent(new CustomEvent('onImsLibInstance', { detail: { instance: window.adobeIMS } }));
+      }, { once: true });
+
+      const result = await fetchRegistrationStatus(EVENT_CODE, {
+        ...deps,
+        isSignedOut: () => false,
+      });
+      expect(result.isRegistered).to.equal(true);
+    });
+
+    it('production fast path: treats the user as unresolvable if window.adobeIMS never becomes available', async () => {
+      delete window.adobeIMS;
+      window.fetch = () => { throw new Error('fetch should not be called'); };
+
+      const result = await fetchRegistrationStatus(EVENT_CODE, {
+        ...deps,
+        isSignedOut: () => false,
+      });
+      expect(result).to.deep.equal({ isRegistered: false });
+    });
+
     it('trusts the redirect cookie without calling the API, and caches it', async () => {
       // No getAccessToken here, so the background auth-warming call below
       // bails out before ever reaching fetch - this only holds because of
