@@ -90,6 +90,31 @@ const IS_C2 = getMetadata('foundation') === 'c2';
 
 const IS_UNAV_NO_FIREFLY_IMS_SCOPE = getMetadata('unav-no-firefly-ims-scope') === 'true';
 
+// Authored per-page: only MAX 2026 pages (with the sessions-guide block present) opt in.
+const IS_ACCOUNT_MENU_LOCAL_SECTION = getMetadata('unav-account-menu-local-section') === 'true';
+const SESSION_GUIDE_URL = getMetadata('session-guide-url');
+const ATTENDEE_DASHBOARD_URL = getMetadata('attendee-dashboard-url');
+
+// Supplying unav.profile.messageEventListener below fully replaces Milo's own listener, so
+// capture Milo's real default (System/AppInitiated/SignOut/ProfileSwitch handling) first and
+// delegate to it for every message the local section below doesn't itself need to intercept.
+const defaultAccountMenuListener = IS_ACCOUNT_MENU_LOCAL_SECTION
+  ? (await import(`${LIBS}/blocks/global-navigation/global-navigation.js`)).getMessageEventListener()
+  : null;
+
+function handleAccountMenuMessage(event) {
+  // NOTE: verify the exact `name`/`payload.subType`/`payload.data` shape against the live
+  // component before shipping — Milo's default listener never handles this message type,
+  // so there's no in-repo example to confirm the Account Menu wiki's table transcription against.
+  const localSection = event.detail?.payload?.data?.['react-mini-app-local-section'];
+  if (localSection?.type === 'LOCAL_SECTION_CUSTOM_ACTION') {
+    const view = localSection.action === 'MyFavorites' ? 'my-favorites' : 'my-sessions';
+    window.location.href = `${SESSION_GUIDE_URL}?sessions&view=${view}`;
+    return;
+  }
+  defaultAccountMenuListener(event);
+}
+
 // Add any config options.
 const CONFIG = {
   codeRoot: '/events',
@@ -123,6 +148,41 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
   ...(IS_UNAV_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,additional_info.roles,account_cluster.read' }),
+  ...(IS_ACCOUNT_MENU_LOCAL_SECTION && SESSION_GUIDE_URL && ATTENDEE_DASHBOARD_URL && {
+    unav: {
+      profile: {
+        complexConfig: {
+          localSectionExperience: {
+            enableSophia: false,
+            staticLocalSection: [{
+              sectionTitle: 'Adobe Max',
+              sectionItems: [
+                {
+                  sectionLinkText: 'Attendee Dashboard',
+                  sectionLinkType: 'external',
+                  sectionLinkUrl: ATTENDEE_DASHBOARD_URL,
+                  analyticsName: 'AttendeeDashboard',
+                },
+                {
+                  sectionLinkText: 'My sessions',
+                  sectionLinkType: 'internal',
+                  sectionLinkCustomAction: 'MySessions',
+                  analyticsName: 'MySessions',
+                },
+                {
+                  sectionLinkText: 'My favorites',
+                  sectionLinkType: 'internal',
+                  sectionLinkCustomAction: 'MyFavorites',
+                  analyticsName: 'MyFavorites',
+                },
+              ],
+            }],
+          },
+        },
+        messageEventListener: handleAccountMenuMessage,
+      },
+    },
+  }),
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   decorateArea,
