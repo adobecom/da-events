@@ -80,6 +80,57 @@ describe('Scripts Functions', () => {
     });
   });
 
+  describe('decorateArea - unconditional section-columns layout', () => {
+    // Mirrors the real decorateArea in events/scripts/scripts.js: applySectionColumnsLayout
+    // must run unconditionally (unlike decorateEvent, which is gated on event-id), since
+    // section-layout targets static pages too. It loads its own required CSS internally.
+    function makeDecorateArea({
+      getMetadata,
+      processAutoBlockLinks,
+      applySectionColumnsLayout,
+      decorateEvent,
+    }) {
+      return function decorateArea(area = document) {
+        processAutoBlockLinks(area);
+        applySectionColumnsLayout();
+        if (!getMetadata('event-id')) return;
+        decorateEvent(area);
+      };
+    }
+
+    it('calls applySectionColumnsLayout even without an event-id, and skips decorateEvent', () => {
+      let layoutCalled = false;
+      let decorateEventCalled = false;
+      const decorateArea = makeDecorateArea({
+        getMetadata: () => undefined,
+        processAutoBlockLinks: () => {},
+        applySectionColumnsLayout: () => { layoutCalled = true; },
+        decorateEvent: () => { decorateEventCalled = true; },
+      });
+
+      decorateArea(document);
+
+      expect(layoutCalled).to.be.true;
+      expect(decorateEventCalled).to.be.false;
+    });
+
+    it('still calls applySectionColumnsLayout and decorateEvent when an event-id is present', () => {
+      let layoutCalled = false;
+      let decorateEventCalled = false;
+      const decorateArea = makeDecorateArea({
+        getMetadata: () => 'test-event-id',
+        processAutoBlockLinks: () => {},
+        applySectionColumnsLayout: () => { layoutCalled = true; },
+        decorateEvent: () => { decorateEventCalled = true; },
+      });
+
+      decorateArea(document);
+
+      expect(layoutCalled).to.be.true;
+      expect(decorateEventCalled).to.be.true;
+    });
+  });
+
   describe('replaceDotMedia', () => {
     it('should replace relative media paths with absolute URLs', () => {
       const mockGetLocale = () => ({ prefix: '' });

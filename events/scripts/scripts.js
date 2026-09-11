@@ -17,9 +17,7 @@ import {
 import { exposeRegistrationStatus, setEventOriginCookie } from './registration-cache.js';
 
 const E_CONFIG = { cmsType: 'DA' };
-const EVENT_BLOCKS_OVERRIDE = [
-  // pick your own subset of blocks if preferred
-];
+const EVENT_BLOCKS_OVERRIDE = [];
 
 const [{
   loadArea,
@@ -37,6 +35,8 @@ const [{
   EVENT_BLOCKS,
   EVENT_BLOCKS_C2,
   processAutoBlockLinks,
+  applySectionColumnsLayout,
+  applyPageBackground,
   initMiloSiteRedesignOverride,
 }] = await Promise.all([
   import(`${LIBS}/utils/utils.js`),
@@ -56,14 +56,14 @@ export default function decorateArea(area = document) {
       return;
     }
 
-    // First image of first row
     eagerLoad(marquee, 'div:first-child img');
-    // Last image of last column of last row
     eagerLoad(marquee, 'div:last-child > div:last-child img');
   }());
 
   processAutoBlockLinks(area);
   initMiloSiteRedesignOverride();
+
+  applySectionColumnsLayout();
 
   if (!getMetadata('event-id')) return;
   decorateEvent(area);
@@ -85,7 +85,6 @@ function replaceDotMedia(area = document) {
 
 const prodDomains = ['milo.adobe.com', 'business.adobe.com', 'www.adobe.com', 'news.adobe.com', 'helpx.adobe.com'];
 
-// Add project-wide style path here.
 const STYLES = '';
 
 const IS_C2 = getMetadata('foundation') === 'c2';
@@ -241,17 +240,14 @@ const CONFIG = {
         base: EVENT_LIBS,
         blocks: EVENT_BLOCKS_OVERRIDE.length ? EVENT_BLOCKS_OVERRIDE : EVENT_BLOCKS,
       },
-    // Add more in order of precedence (first match wins):
   ],
 };
 
 const MILO_CONFIG = setConfig({ ...CONFIG });
 setEventConfig(E_CONFIG, MILO_CONFIG);
 
-// loadIms() memoizes internally, so downstream MEP/GNAV/martech calls reuse this promise.
 loadIms().catch(() => {});
 
-// Fire-and-forget, doesn't block decorateArea/loadPage - see registration-cache.js.
 const eventCode = getMetadata('event-code');
 if (eventCode) {
   setEventOriginCookie();
@@ -260,22 +256,12 @@ if (eventCode) {
 
 replaceDotMedia(document);
 
-// Decorate the page with site specific needs.
-
 decorateArea();
-
-/*
- * ------------------------------------------------------------
- * Edit below at your own risk
- * ------------------------------------------------------------
- */
 
 (function loadStyles() {
   const stylesPrefix = IS_C2 ? '/c2' : '';
   const paths = [`${LIBS}${stylesPrefix}/styles/styles.css`];
   if (STYLES) { paths.push(STYLES); }
-  // Page-wide C2 styles from event-libs (rounded video players, etc.) -
-  // separate from Milo's own C2 styles.css above.
   if (IS_C2) { paths.push(`${EVENT_LIBS}/c2/styles/c2-global.css`); }
   paths.forEach((path) => {
     const link = document.createElement('link');
@@ -292,6 +278,8 @@ async function loadPage() {
   } catch (e) {
     window.lana?.log(`Error in loadArea():\n${JSON.stringify(e, null, 2)}`);
   }
+  applySectionColumnsLayout();
+  applyPageBackground();
   const { eventsDelayedActions } = await import(`${EVENT_LIBS}/libs.js`);
   eventsDelayedActions();
 }
