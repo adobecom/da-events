@@ -36,12 +36,21 @@
     const { context } = await DA_SDK;
 
     const branch = context?.ref || 'main';
-    const base = `https://${branch}--event-libs--adobecom.aem.live/event-libs/tier-1-event-configurator`;
+    const eventLibsBase = `https://${branch}--event-libs--adobecom.aem.live/event-libs`;
+    const base = `${eventLibsBase}/tier-1-event-configurator`;
 
     const css = document.createElement('link');
     css.rel = 'stylesheet';
     css.href = `${base}/tier-1-event-configurator.css`;
     document.head.appendChild(css);
+
+    // TierOneEventConfigurator.js mounts Session Guide Configurator directly as its
+    // "Session Guide Config" tab, so its stylesheet has to be present here too — only
+    // its own <name>.js entry point (not imported by this tab) normally loads it.
+    const sgcCss = document.createElement('link');
+    sgcCss.rel = 'stylesheet';
+    sgcCss.href = `${eventLibsBase}/session-guide-configurator/session-guide-configurator.css`;
+    document.head.appendChild(sgcCss);
 
     await import(`${base}/tier-1-event-configurator.js`);
   </script>
