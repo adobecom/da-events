@@ -94,26 +94,38 @@ const IS_UNAV_NO_FIREFLY_IMS_SCOPE = getMetadata('unav-no-firefly-ims-scope') ==
 const IS_ACCOUNT_MENU_LOCAL_SECTION = getMetadata('unav-account-menu-local-section') === 'true';
 const SESSION_GUIDE_URL = getMetadata('session-guide-url');
 const ATTENDEE_DASHBOARD_URL = getMetadata('attendee-dashboard-url');
+const ENABLE_ACCOUNT_MENU_LOCAL_SECTION = IS_ACCOUNT_MENU_LOCAL_SECTION
+  && SESSION_GUIDE_URL
+  && ATTENDEE_DASHBOARD_URL;
 
-// Supplying unav.profile.messageEventListener below fully replaces Milo's own listener, so
-// capture Milo's real default (System/AppInitiated/SignOut/ProfileSwitch handling) first and
-// delegate to it for every message the local section below doesn't itself need to intercept.
-const defaultAccountMenuListener = IS_ACCOUNT_MENU_LOCAL_SECTION
-  ? (await import(`${LIBS}/blocks/global-navigation/global-navigation.js`)).getMessageEventListener()
-  : null;
-
-function handleAccountMenuMessage(event) {
-  // NOTE: verify the exact `name`/`payload.subType`/`payload.data` shape against the live
-  // component before shipping — Milo's default listener never handles this message type,
-  // so there's no in-repo example to confirm the Account Menu wiki's table transcription against.
-  const localSection = event.detail?.payload?.data?.['react-mini-app-local-section'];
-  if (localSection?.type === 'LOCAL_SECTION_CUSTOM_ACTION') {
+// The Account Menu mini-app's `message` CustomEvent supports multiple independent listeners
+// on the same <account-menu-trigger> element, so this attaches its own listener directly on
+// the element instead of replacing unav.profile.messageEventListener - which would fully take
+// over Milo's own SignOut/ProfileSwitch/AppInitiated handling, since that config only supports
+// a single listener function.
+function watchAccountMenuLocalSection() {
+  const handleLocalSectionClick = (event) => {
+    const localSection = event.detail?.payload?.data?.['react-mini-app-local-section'];
+    if (localSection?.type !== 'LOCAL_SECTION_CUSTOM_ACTION') return;
     const view = localSection.action === 'MyFavorites' ? 'my-favorites' : 'my-sessions';
     window.location.href = `${SESSION_GUIDE_URL}?sessions&view=${view}`;
+  };
+
+  const existingTrigger = document.querySelector('account-menu-trigger');
+  if (existingTrigger) {
+    existingTrigger.addEventListener('message', handleLocalSectionClick);
     return;
   }
-  defaultAccountMenuListener(event);
+  const observer = new MutationObserver(() => {
+    const trigger = document.querySelector('account-menu-trigger');
+    if (!trigger) return;
+    trigger.addEventListener('message', handleLocalSectionClick);
+    observer.disconnect();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 }
+
+if (ENABLE_ACCOUNT_MENU_LOCAL_SECTION) watchAccountMenuLocalSection();
 
 // Add any config options.
 const CONFIG = {
@@ -148,7 +160,7 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
   ...(IS_UNAV_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,additional_info.roles,account_cluster.read' }),
-  ...(IS_ACCOUNT_MENU_LOCAL_SECTION && SESSION_GUIDE_URL && ATTENDEE_DASHBOARD_URL && {
+  ...(ENABLE_ACCOUNT_MENU_LOCAL_SECTION && {
     unav: {
       profile: {
         complexConfig: {
@@ -179,7 +191,6 @@ const CONFIG = {
             }],
           },
         },
-        messageEventListener: handleAccountMenuMessage,
       },
     },
   }),
