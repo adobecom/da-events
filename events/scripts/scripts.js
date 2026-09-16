@@ -125,6 +125,7 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
   ...(IS_UNAV_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,additional_info.roles,account_cluster.read' }),
+  unav: { uncAppId: 'da-events' },
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   decorateArea,
