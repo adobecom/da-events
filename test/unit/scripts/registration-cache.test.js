@@ -1,4 +1,5 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import {
   cacheKey,
   readCache,
@@ -142,6 +143,7 @@ describe('registration-cache', () => {
       isSignedOut: () => false,
       getConfig: () => ({ env: { name: 'stage' } }),
       loadIms: async () => {},
+      imsInstanceTimeout: 10,
     };
 
     it('returns not-registered without calling the API when signed out', async () => {
@@ -168,6 +170,92 @@ describe('registration-cache', () => {
       const result = await fetchRegistrationStatus(EVENT_CODE, previewDeps);
       expect(loadImsCalled).to.equal(true);
       expect(result.isRegistered).to.equal(true);
+    });
+
+    it('falls back to the onImsLibInstance handshake when isSignedInUser() is not yet reliable right after loadIms()', async () => {
+      let signedIn = false;
+      window.adobeIMS = {
+        getProfile: async () => ({ userId: USER_ID }),
+        getAccessToken: () => ({ token: 'abc' }),
+        isSignedInUser: () => signedIn,
+      };
+      window.fetch = async () => ({ ok: true, json: async () => ({ isRegistered: true }) });
+
+      // imslib finishes initializing shortly after loadIms() resolved -
+      // dispatch its native ready event once something starts listening.
+      window.addEventListener('getImsLibInstance', () => {
+        signedIn = true;
+        window.dispatchEvent(new CustomEvent('onImsLibInstance', { detail: { instance: {} } }));
+      }, { once: true });
+
+      const resultPromise = fetchRegistrationStatus(EVENT_CODE, {
+        ...deps,
+        isSignedOut: () => true,
+      });
+      const result = await resultPromise;
+      expect(result.isRegistered).to.equal(true);
+    });
+
+    it('gives up and treats the user as signed out if the onImsLibInstance handshake times out', async () => {
+      window.adobeIMS = { isSignedInUser: () => false };
+      window.fetch = () => { throw new Error('fetch should not be called'); };
+
+      // Fake the clock so waitForImsInstance()'s internal setTimeout fires
+      // instantly instead of the test actually waiting imsInstanceTimeout ms.
+      const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        const resultPromise = fetchRegistrationStatus(EVENT_CODE, {
+          ...deps,
+          isSignedOut: () => true,
+        });
+        await clock.tickAsync(deps.imsInstanceTimeout);
+        const result = await resultPromise;
+        expect(result).to.deep.equal({ isRegistered: false });
+      } finally {
+        clock.restore();
+      }
+    });
+
+    it('production fast path: waits for window.adobeIMS via the handshake when the sis header says signed in but IMS is not yet ready', async () => {
+      // isSignedOut() false (sis header says signed in) skips the loadIms()
+      // await entirely - window.adobeIMS starts out undefined here, matching
+      // a production race where the fire-and-forget loadIms() from
+      // scripts.js hasn't finished yet by the time this runs.
+      delete window.adobeIMS;
+      window.fetch = async () => ({ ok: true, json: async () => ({ isRegistered: true }) });
+
+      window.addEventListener('getImsLibInstance', () => {
+        window.adobeIMS = {
+          isSignedInUser: () => true,
+          getProfile: async () => ({ userId: USER_ID }),
+          getAccessToken: () => ({ token: 'abc' }),
+        };
+        window.dispatchEvent(new CustomEvent('onImsLibInstance', { detail: { instance: window.adobeIMS } }));
+      }, { once: true });
+
+      const result = await fetchRegistrationStatus(EVENT_CODE, {
+        ...deps,
+        isSignedOut: () => false,
+      });
+      expect(result.isRegistered).to.equal(true);
+    });
+
+    it('production fast path: treats the user as unresolvable if window.adobeIMS never becomes available', async () => {
+      delete window.adobeIMS;
+      window.fetch = () => { throw new Error('fetch should not be called'); };
+
+      const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        const resultPromise = fetchRegistrationStatus(EVENT_CODE, {
+          ...deps,
+          isSignedOut: () => false,
+        });
+        await clock.tickAsync(deps.imsInstanceTimeout);
+        const result = await resultPromise;
+        expect(result).to.deep.equal({ isRegistered: false });
+      } finally {
+        clock.restore();
+      }
     });
 
     it('trusts the redirect cookie without calling the API, and caches it', async () => {
@@ -218,15 +306,19 @@ describe('registration-cache', () => {
       await fetchStarted;
       resolveFetch({
         ok: true,
-        json: async () => ({
-          isRegistered: true, inPersonAttendee: true, authToken: 'tok-7', userKey: 'key-7',
-        }),
+        json: async () => ({ isRegistered: true, inPersonAttendee: true, authToken: 'tok-7', userKey: 'key-7' }),
       });
-      // Macrotask flush: the fire-and-forget chain (fetch -> response.json()
-      // -> destructure/write) spans multiple microtask ticks, and it's not
-      // awaited anywhere - a setTimeout(0) reliably lets all of them settle
-      // instead of guessing how many chained Promise.resolve() ticks it needs.
-      await new Promise((resolve) => { setTimeout(resolve, 0); });
+      // The fire-and-forget chain (fetch -> response.json() -> destructure/
+      // write) spans multiple microtask ticks and isn't awaited anywhere -
+      // a fake-timer tick(0) reliably lets all of them settle instead of
+      // guessing how many chained Promise.resolve() ticks it needs, and
+      // without relying on a real setTimeout.
+      const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        await clock.tickAsync(0);
+      } finally {
+        clock.restore();
+      }
 
       expect(readAuthCache(EVENT_CODE, USER_ID)).to.deep.equal({ authToken: 'tok-7', userKey: 'key-7' });
       // Once the background call resolves with the real status, it patches
@@ -300,15 +392,11 @@ describe('registration-cache', () => {
         getProfile: async () => ({ userId: USER_ID }),
         getAccessToken: () => ({ token: 'abc' }),
       };
-      const apiResponse = {
-        isRegistered: true, inPersonAttendee: false, authToken: 'tok-3', userKey: 'key-3',
-      };
+      const apiResponse = { isRegistered: true, inPersonAttendee: false, authToken: 'tok-3', userKey: 'key-3' };
       window.fetch = async () => ({ ok: true, json: async () => apiResponse });
 
       const result = await fetchRegistrationStatus(EVENT_CODE, deps);
-      expect(result).to.deep.equal({
-        isRegistered: true, inPersonAttendee: false, authToken: 'tok-3', userKey: 'key-3',
-      });
+      expect(result).to.deep.equal({ isRegistered: true, inPersonAttendee: false, authToken: 'tok-3', userKey: 'key-3' });
       expect(readCache(EVENT_CODE, USER_ID)).to.deep.equal({
         isRegistered: true,
         inPersonAttendee: false,
@@ -361,6 +449,7 @@ describe('registration-cache', () => {
         isSignedOut: () => false,
         getConfig: () => ({ env: { name: 'stage' } }),
         loadIms: async () => {},
+        imsInstanceTimeout: 10,
       };
       const [result, eventDetail] = await Promise.all([
         preloadRegistrationStatus(EVENT_CODE, deps),
@@ -377,6 +466,7 @@ describe('registration-cache', () => {
       isSignedOut: () => false,
       getConfig: () => ({ env: { name: 'stage' } }),
       loadIms: async () => {},
+      imsInstanceTimeout: 10,
     };
 
     it('exposes window.events.getRegistrationStatus, resolving to the gating flags only', async () => {
@@ -403,18 +493,14 @@ describe('registration-cache', () => {
       };
       window.fetch = async () => ({
         ok: true,
-        json: async () => ({
-          isRegistered: true, inPersonAttendee: true, authToken: 'tok-5', userKey: 'key-5',
-        }),
+        json: async () => ({ isRegistered: true, inPersonAttendee: true, authToken: 'tok-5', userKey: 'key-5' }),
       });
 
       exposeRegistrationStatus(EVENT_CODE, deps);
       expect(window.events.getRegistrationDetails).to.be.a('function');
 
       const details = await window.events.getRegistrationDetails();
-      expect(details).to.deep.equal({
-        isRegistered: true, inPersonAttendee: true, authToken: 'tok-5', userKey: 'key-5',
-      });
+      expect(details).to.deep.equal({ isRegistered: true, inPersonAttendee: true, authToken: 'tok-5', userKey: 'key-5' });
     });
 
     it('memoizes: a late caller after resolution gets the same promise without triggering another fetch', async () => {
@@ -447,9 +533,7 @@ describe('registration-cache', () => {
         fetchCount += 1;
         return {
           ok: true,
-          json: async () => ({
-            isRegistered: true, inPersonAttendee: true, authToken: 'tok-6', userKey: 'key-6',
-          }),
+          json: async () => ({ isRegistered: true, inPersonAttendee: true, authToken: 'tok-6', userKey: 'key-6' }),
         };
       };
 
@@ -460,9 +544,7 @@ describe('registration-cache', () => {
       ]);
       expect(fetchCount).to.equal(1);
       expect(status).to.deep.equal({ isRegistered: true, inPersonAttendee: true });
-      expect(details).to.deep.equal({
-        isRegistered: true, inPersonAttendee: true, authToken: 'tok-6', userKey: 'key-6',
-      });
+      expect(details).to.deep.equal({ isRegistered: true, inPersonAttendee: true, authToken: 'tok-6', userKey: 'key-6' });
     });
   });
 });

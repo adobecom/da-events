@@ -94,14 +94,37 @@ export function setEventOriginCookie() {
   ].join('; ');
 }
 
-async function getUserId(isSignedOut, loadIms) {
+function waitForImsInstance(timeout = 3000) {
+  return new Promise((resolve, reject) => {
+    let timer;
+    const onReady = (e) => {
+      window.removeEventListener('onImsLibInstance', onReady);
+      clearTimeout(timer);
+      if (e?.detail?.instance) resolve(e.detail.instance); else reject();
+    };
+    timer = setTimeout(() => {
+      window.removeEventListener('onImsLibInstance', onReady);
+      reject();
+    }, timeout);
+    window.addEventListener('onImsLibInstance', onReady);
+    window.dispatchEvent(new CustomEvent('getImsLibInstance'));
+  });
+}
+
+async function getUserId(isSignedOut, loadIms, imsInstanceTimeout) {
   // isSignedOut() is unconditionally true on preview domains (no `sis`
   // Server-Timing header there) - fall back to IMS once it's loaded.
   if (isSignedOut()) {
     await loadIms().catch(() => {});
+    if (!window.adobeIMS?.isSignedInUser()) {
+      await waitForImsInstance(imsInstanceTimeout).catch(() => {});
+    }
     if (!window.adobeIMS?.isSignedInUser()) return false;
   }
   try {
+    if (!window.adobeIMS) {
+      await waitForImsInstance(imsInstanceTimeout).catch(() => {});
+    }
     const { userId } = await window.adobeIMS.getProfile();
     return userId;
   } catch {
@@ -132,9 +155,7 @@ async function fetchAndCacheAuth(eventCode, userId, getConfig) {
       return null;
     }
     // RainFocus returns {} (not { isRegistered: false }) when not registered.
-    const {
-      authToken, userKey, ...status
-    } = { isRegistered: false, ...(await response.json()) };
+    const { authToken, userKey, ...status } = { isRegistered: false, ...(await response.json()) };
     writeAuthCache(eventCode, userId, { authToken, userKey });
     return { status, authToken, userKey };
   } catch (e) {
@@ -146,8 +167,11 @@ async function fetchAndCacheAuth(eventCode, userId, getConfig) {
   }
 }
 
-export async function fetchRegistrationStatus(eventCode, { isSignedOut, getConfig, loadIms }) {
-  const userId = await getUserId(isSignedOut, loadIms);
+export async function fetchRegistrationStatus(
+  eventCode,
+  { isSignedOut, getConfig, loadIms, imsInstanceTimeout },
+) {
+  const userId = await getUserId(isSignedOut, loadIms, imsInstanceTimeout);
   if (!userId) return DEFAULT_RESULT;
 
   if (justRegistered(eventCode)) {
@@ -178,9 +202,7 @@ export async function preloadRegistrationStatus(eventCode, deps) {
   const result = await fetchRegistrationStatus(eventCode, deps);
   const { isRegistered, inPersonAttendee } = result;
   // authToken/userKey deliberately excluded - this is a page-wide broadcast.
-  window.dispatchEvent(new CustomEvent('registration:resolved', {
-    detail: { isRegistered, inPersonAttendee },
-  }));
+  window.dispatchEvent(new CustomEvent('registration:resolved', { detail: { isRegistered, inPersonAttendee } }));
   return result;
 }
 
