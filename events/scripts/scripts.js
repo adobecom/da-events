@@ -37,6 +37,7 @@ const [{
   EVENT_BLOCKS,
   EVENT_BLOCKS_C2,
   processAutoBlockLinks,
+  initMiloSiteRedesignOverride,
 }] = await Promise.all([
   import(`${LIBS}/utils/utils.js`),
   import(`${EVENT_LIBS}/libs.js`),
@@ -62,6 +63,7 @@ export default function decorateArea(area = document) {
   }());
 
   processAutoBlockLinks(area);
+  initMiloSiteRedesignOverride();
 
   if (!getMetadata('event-id')) return;
   decorateEvent(area);
@@ -160,8 +162,9 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
   ...(IS_UNAV_NO_FIREFLY_IMS_SCOPE && { imsScope: 'AdobeID,openid,gnav,pps.read,read_organizations,additional_info.roles,account_cluster.read' }),
-  ...(ENABLE_ACCOUNT_MENU_LOCAL_SECTION && {
-    unav: {
+  unav: {
+    uncAppId: 'da-events',
+    ...(ENABLE_ACCOUNT_MENU_LOCAL_SECTION && {
       profile: {
         complexConfig: {
           localSectionExperience: {
@@ -192,8 +195,8 @@ const CONFIG = {
           },
         },
       },
-    },
-  }),
+    }),
+  },
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   decorateArea,
