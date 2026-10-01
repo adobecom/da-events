@@ -37,7 +37,6 @@ const [{
   EVENT_BLOCKS,
   EVENT_BLOCKS_C2,
   processAutoBlockLinks,
-  initMiloSiteRedesignOverride,
 }] = await Promise.all([
   import(`${LIBS}/utils/utils.js`),
   import(`${EVENT_LIBS}/libs.js`),
@@ -63,7 +62,6 @@ export default function decorateArea(area = document) {
   }());
 
   processAutoBlockLinks(area);
-  initMiloSiteRedesignOverride();
 
   if (!getMetadata('event-id')) return;
   decorateEvent(area);
