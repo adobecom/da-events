@@ -111,6 +111,26 @@ describe('alloy-all-guard', () => {
     expect(launch.data.list).to.deep.equal([9]);
   });
 
+  it('ignores prototype-polluting keys when merging', () => {
+    installAlloyAllGuard(win);
+    const launch = createLaunchAlloyAll();
+    win.alloy_all = launch;
+
+    const copy = { ...launch, data: { ...launch.data } };
+    Object.defineProperty(copy.data, '__proto__', { value: { polluted: true }, enumerable: true });
+    copy.data.constructor = { prototype: { polluted: true } };
+    copy.data.prototype = { polluted: true };
+    copy.data.safe = 'ok';
+    win.alloy_all = copy;
+
+    expect(win.alloy_all).to.equal(launch);
+    expect(launch.data.safe).to.equal('ok');
+    expect(Object.prototype.hasOwnProperty.call(launch.data, 'prototype')).to.equal(false);
+    expect(launch.data.constructor).to.equal(Object);
+    expect(({}).polluted).to.equal(undefined);
+    expect(launch.data.polluted).to.equal(undefined);
+  });
+
   it('does not install over a non-configurable or accessor property', () => {
     const locked = {};
     Object.defineProperty(locked, 'alloy_all', { value: 1, configurable: false, writable: true });

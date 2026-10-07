@@ -11,11 +11,13 @@
 // global-navigation does. Every other assignment passes through untouched.
 
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 function mergeInto(target, source, seen = new WeakSet()) {
   if (seen.has(source)) return;
   seen.add(source);
   Object.keys(source).forEach((key) => {
+    if (UNSAFE_KEYS.has(key)) return;
     const next = source[key];
     const current = target[key];
     if (next === current) return;
