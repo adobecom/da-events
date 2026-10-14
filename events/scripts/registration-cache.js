@@ -94,7 +94,7 @@ export function setEventOriginCookie() {
   ].join('; ');
 }
 
-function waitForImsInstance(timeout = 3000) {
+function waitForImsInstance(timeout = 15000) {
   return new Promise((resolve, reject) => {
     let timer;
     const onReady = (e) => {
