@@ -15,6 +15,10 @@ import {
   EVENT_LIBS,
 } from './utils.js';
 import { exposeRegistrationStatus, setEventOriginCookie } from './registration-cache.js';
+import installAlloyAllGuard from './alloy-all-guard.js';
+
+// TEMPORARY (MWPW-210049): must run before federal's universal nav ARP token arrives.
+installAlloyAllGuard();
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
