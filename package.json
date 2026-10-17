@@ -41,7 +41,7 @@
     "stylelint": "14.6.0",
     "stylelint-config-prettier": "9.0.3",
     "stylelint-config-standard": "25.0.0",
-    "@adobe/aem-cli": "^16.19.1"
+    "@adobe/aem-cli": "^16.22.9"
   },
   "dependencies": {
     "@adobecom/milo": "github:adobecom/milo#main"
