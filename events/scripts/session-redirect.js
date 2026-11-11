@@ -1,10 +1,8 @@
 const SESSION_PARAM = 'session';
 const SESSIONS_PATH = '/max/2026/sessions';
 const SLUG_PATTERN = /^[a-z0-9-]+$/i;
-const HOMEPAGE_PATTERN = /^(\/[a-z_]+)?\/max(?:\.html)?\/?$/i;
-
-// EDS hosts serve extensionless paths; only the Akamai domains (adobe.com) use .html.
-const isEdsHost = (hostname) => /\.(aem|hlx)\.(page|live)$|^localhost$/.test(hostname);
+const HOMEPAGE_PATTERN = /^(\/[a-z_]+)?\/max(\.html)?\/?$/i;
+const LOOKUP_TIMEOUT_MS = 3000;
 
 export function getSessionRedirectUrl(href) {
   const url = new URL(href);
@@ -12,8 +10,8 @@ export function getSessionRedirectUrl(href) {
   const match = url.pathname.match(HOMEPAGE_PATTERN);
   if (!match || !slug || !SLUG_PATTERN.test(slug)) return null;
   url.searchParams.delete(SESSION_PARAM);
-  const ext = isEdsHost(url.hostname) ? '' : '.html';
-  url.pathname = `${match[1] || ''}${SESSIONS_PATH}/${slug}${ext}`;
+  const [, locale = '', ext = ''] = match;
+  url.pathname = `${locale}${SESSIONS_PATH}/${slug}${ext}`;
   return url;
 }
 
@@ -27,13 +25,16 @@ export default async function redirectLegacySessionModal(win = window) {
   const target = getSessionRedirectUrl(current.href);
   if (target) {
     try {
-      const resp = await win.fetch(target.pathname, { method: 'HEAD' });
+      const resp = await win.fetch(target.pathname, {
+        method: 'HEAD',
+        signal: AbortSignal.timeout(LOOKUP_TIMEOUT_MS),
+      });
       if (resp.ok) {
         win.location.replace(target.href);
         return true;
       }
     } catch {
-      // Unknown session: fall through to the homepage.
+      // Lookup failed or timed out: stay on the homepage.
     }
   }
 

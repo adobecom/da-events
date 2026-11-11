@@ -21,6 +21,7 @@ import redirectLegacySessionModal from './session-redirect.js';
 // TEMPORARY (MWPW-210049): must run before federal's universal nav ARP token arrives.
 installAlloyAllGuard();
 
+// TEMPORARY (MWPW-214940): remove before MAX 2027; ?session= is also the Session Guide deep link.
 // Runs before any block loads so the Session Guide modal never opens; halts loading on redirect.
 if (await redirectLegacySessionModal()) await new Promise(() => {});
 

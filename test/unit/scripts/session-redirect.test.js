@@ -29,7 +29,12 @@ describe('session-redirect', () => {
       expect(url.href).to.equal(`https://www.adobe.com/de/max/2026/sessions/${SLUG}.html?utm_source=x&utm_medium=y#top`);
     });
 
-    it('omits .html on EDS hosts', () => {
+    it('takes the extension from the current URL', () => {
+      const url = getSessionRedirectUrl(`https://www.adobe.com/max?session=${SLUG}`);
+      expect(url.href).to.equal(`https://www.adobe.com/max/2026/sessions/${SLUG}`);
+    });
+
+    it('omits .html on extensionless EDS URLs', () => {
       const page = getSessionRedirectUrl(`https://branch--da-events--adobecom.aem.page/max?session=${SLUG}&utm_source=x`);
       const live = getSessionRedirectUrl(`https://main--da-events--adobecom.aem.live/fr/max?session=${SLUG}`);
       const local = getSessionRedirectUrl(`http://localhost:3000/max?session=${SLUG}`);
@@ -59,7 +64,9 @@ describe('session-redirect', () => {
       const { win, calls } = createWin(`https://www.adobe.com/max.html?session=${SLUG}&utm_campaign=c`);
       const result = await redirectLegacySessionModal(win);
       expect(result).to.be.true;
-      expect(calls.fetch[0]).to.deep.equal({ url: `/max/2026/sessions/${SLUG}.html`, opts: { method: 'HEAD' } });
+      expect(calls.fetch[0].url).to.equal(`/max/2026/sessions/${SLUG}.html`);
+      expect(calls.fetch[0].opts.method).to.equal('HEAD');
+      expect(calls.fetch[0].opts.signal).to.be.instanceOf(AbortSignal);
       expect(calls.replace).to.deep.equal([`https://www.adobe.com/max/2026/sessions/${SLUG}.html?utm_campaign=c`]);
     });
 
