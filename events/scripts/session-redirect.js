@@ -3,13 +3,17 @@ const SESSIONS_PATH = '/max/2026/sessions';
 const SLUG_PATTERN = /^[a-z0-9-]+$/i;
 const HOMEPAGE_PATTERN = /^(\/[a-z_]+)?\/max(?:\.html)?\/?$/i;
 
+// EDS hosts serve extensionless paths; only the Akamai domains (adobe.com) use .html.
+const isEdsHost = (hostname) => /\.(aem|hlx)\.(page|live)$|^localhost$/.test(hostname);
+
 export function getSessionRedirectUrl(href) {
   const url = new URL(href);
   const slug = url.searchParams.get(SESSION_PARAM);
   const match = url.pathname.match(HOMEPAGE_PATTERN);
   if (!match || !slug || !SLUG_PATTERN.test(slug)) return null;
   url.searchParams.delete(SESSION_PARAM);
-  url.pathname = `${match[1] || ''}${SESSIONS_PATH}/${slug}.html`;
+  const ext = isEdsHost(url.hostname) ? '' : '.html';
+  url.pathname = `${match[1] || ''}${SESSIONS_PATH}/${slug}${ext}`;
   return url;
 }
 

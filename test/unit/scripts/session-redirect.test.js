@@ -29,6 +29,20 @@ describe('session-redirect', () => {
       expect(url.href).to.equal(`https://www.adobe.com/de/max/2026/sessions/${SLUG}.html?utm_source=x&utm_medium=y#top`);
     });
 
+    it('omits .html on EDS hosts', () => {
+      const page = getSessionRedirectUrl(`https://branch--da-events--adobecom.aem.page/max?session=${SLUG}&utm_source=x`);
+      const live = getSessionRedirectUrl(`https://main--da-events--adobecom.aem.live/fr/max?session=${SLUG}`);
+      const local = getSessionRedirectUrl(`http://localhost:3000/max?session=${SLUG}`);
+      expect(page.href).to.equal(`https://branch--da-events--adobecom.aem.page/max/2026/sessions/${SLUG}?utm_source=x`);
+      expect(live.href).to.equal(`https://main--da-events--adobecom.aem.live/fr/max/2026/sessions/${SLUG}`);
+      expect(local.href).to.equal(`http://localhost:3000/max/2026/sessions/${SLUG}`);
+    });
+
+    it('keeps .html on stage.adobe.com', () => {
+      const url = getSessionRedirectUrl(`https://www.stage.adobe.com/max.html?session=${SLUG}`);
+      expect(url.href).to.equal(`https://www.stage.adobe.com/max/2026/sessions/${SLUG}.html`);
+    });
+
     it('returns null for non-homepage paths', () => {
       expect(getSessionRedirectUrl(`https://www.adobe.com/max/2026/agenda.html?session=${SLUG}`)).to.be.null;
     });
