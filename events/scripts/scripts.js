@@ -16,9 +16,14 @@ import {
 } from './utils.js';
 import { exposeRegistrationStatus, setEventOriginCookie } from './registration-cache.js';
 import installAlloyAllGuard from './alloy-all-guard.js';
+import redirectLegacySessionModal from './session-redirect.js';
 
 // TEMPORARY (MWPW-210049): must run before federal's universal nav ARP token arrives.
 installAlloyAllGuard();
+
+// TEMPORARY (MWPW-214940): remove before MAX 2027; ?session= is also the Session Guide deep link.
+// Runs before any block loads so the Session Guide modal never opens; halts loading on redirect.
+if (await redirectLegacySessionModal()) await new Promise(() => {});
 
 const E_CONFIG = { cmsType: 'DA' };
 const EVENT_BLOCKS_OVERRIDE = [
