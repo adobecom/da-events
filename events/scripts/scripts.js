@@ -149,6 +149,13 @@ const CONFIG = {
     la: ['bo', 'cr', 'do', 'ec', 'gt', 'pa', 'pr', 'py', 'sv', 'uy', 've'],
     mena_en: ['bh', 'dz', 'iq', 'ir', 'jo', 'lb', 'ly', 'om', 'ps', 'sy', 'tn', 'ye'],
     cis_en: ['am', 'az', 'ge', 'kz', 'kg', 'md', 'tj', 'tm', 'uz'],
+    // Lingo Phase 5: region keys that don't match `${country}_${baseSite}` on /ara and /zh-hant
+    ae_ar: ['ae'],
+    eg_ar: ['eg'],
+    kw_ar: ['kw'],
+    qa_ar: ['qa'],
+    sa_ar: ['sa'],
+    hk_zh: ['hk'],
   },
   miloLibs: LIBS,
   prodDomains,
