@@ -99,6 +99,28 @@ const STYLES = '';
 
 const IS_C2 = getMetadata('foundation') === 'c2';
 
+// Experience opt-in (plan: docs/c2-summit-experience-implementation-plan.md in event-libs).
+// Authored as page metadata `event-experience: summit`; only meaningful on C2 pages.
+const EXPERIENCE_META = getMetadata('event-experience');
+const EXPERIENCE_ID = IS_C2 && EXPERIENCE_META === 'summit' ? 'summit' : '';
+if (EXPERIENCE_META && !EXPERIENCE_ID) {
+  window.lana?.log(`event-experience "${EXPERIENCE_META}" ignored: needs foundation c2 and a supported value`);
+}
+if (EXPERIENCE_ID) document.documentElement.dataset.eventExperience = EXPERIENCE_ID;
+
+async function getC2Blocks() {
+  if (!EXPERIENCE_ID) return EVENT_BLOCKS_C2;
+  try {
+    const { SUMMIT_BLOCKS } = await import(`${EVENT_LIBS}/experiences/summit/registry.js`);
+    if (!Array.isArray(SUMMIT_BLOCKS) || !SUMMIT_BLOCKS.length) throw new Error('registry is empty or malformed');
+    return SUMMIT_BLOCKS;
+  } catch (e) {
+    // Do not fall back to the MAX registry: a requested experience that cannot load must fail visibly.
+    window.lana?.log(`Summit registry failed to load: ${e.message}`);
+    throw e;
+  }
+}
+
 const IS_UNAV_NO_FIREFLY_IMS_SCOPE = getMetadata('unav-no-firefly-ims-scope') === 'true';
 
 // Authored per-page: only MAX 2026 pages (with the sessions-guide block present) opt in.
@@ -139,6 +161,7 @@ function watchAccountMenuLocalSection() {
 if (ENABLE_ACCOUNT_MENU_LOCAL_SECTION) watchAccountMenuLocalSection();
 
 // Add any config options.
+const C2_BLOCKS = await getC2Blocks();
 const CONFIG = {
   codeRoot: '/events',
   contentRoot: '/events',
@@ -327,7 +350,7 @@ const CONFIG = {
   signInContext: getSusiOptions(),
   externalLibs: [
     IS_C2
-      ? { base: `${EVENT_LIBS}/c2`, blocks: EVENT_BLOCKS_C2 }
+      ? { base: `${EVENT_LIBS}/c2`, blocks: C2_BLOCKS }
       : {
         base: EVENT_LIBS,
         blocks: EVENT_BLOCKS_OVERRIDE.length ? EVENT_BLOCKS_OVERRIDE : EVENT_BLOCKS,
@@ -368,6 +391,8 @@ decorateArea();
   // Page-wide C2 styles from event-libs (rounded video players, etc.) -
   // separate from Milo's own C2 styles.css above.
   if (IS_C2) { paths.push(`${EVENT_LIBS}/c2/styles/c2-global.css`); }
+  // Scoped under [data-event-experience="summit"]; never requested on non-Summit pages.
+  if (EXPERIENCE_ID) { paths.push(`${EVENT_LIBS}/experiences/${EXPERIENCE_ID}/${EXPERIENCE_ID}.css`); }
   paths.forEach((path) => {
     const link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
