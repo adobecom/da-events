@@ -29,6 +29,7 @@ Read these files when the task needs them:
 | `project/decisions.md` | Before changing an agreed convention |
 
 ## After each request
-- Commit with a message that summarizes the request and push to `ema-poc`. Never push to `main`, `stage`, or `dev`.
-- If pages changed, list them and ask whether to upload them to Experience Workspace.
+- Don't commit or push. This POC changes content only; migration scaffolding (import scripts, `catalog/`, `.hlxignore` edits) stays in the console workspace.
+- If a code change seems needed, describe it and stop; a developer will push it via PR to `ema-poc`. Never push to `main`, `stage`, or `dev`.
+- If pages changed, list them and ask whether to upload them to Experience Workspace (only under `/drafts/ema-poc/`).
 - Keep answers short: what changed, where, and anything that needs a decision.
