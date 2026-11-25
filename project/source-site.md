@@ -1,32 +1,34 @@
 # Source site
 
-Source: AEM Sites, `https://summit.adobe.com`. Page list: `https://summit.adobe.com/sitemap.xml` (30 URLs).
-Destination path = `/drafts/ema-poc` + source path without the trailing slash. `https://summit.adobe.com/na/hotels/` → `/drafts/ema-poc/na/hotels`; `https://summit.adobe.com/` → `/drafts/ema-poc/index`.
+Source: AEM Sites, `https://summit.adobe.com`. Page list: `https://summit.adobe.com/sitemap.xml` (30 URLs: 15 pages, 15 redirects).
+Destination path = `/drafts/ema-poc` + source path without the trailing slash, e.g. `https://summit.adobe.com/na/hotels/` → `/drafts/ema-poc/na/hotels`.
 Never create, upload, or overwrite content outside `/drafts/ema-poc/`.
 
-## Template groups
+## Migrated pages (2026-11-25)
 
-Pick the first page of a group from the batch that covers it, then reuse its blocks for the rest of the group.
+All 15 are in DA under `/drafts/ema-poc/` and previewed; none are published. Template names come from the console's site scope.
 
-| Template group | Pages | Notes |
+| Template | Pages |
+|---|---|
+| info-page | `/na/agenda/`, `/na/hotels/`, `/na/pricing/`, `/na/sponsors/`, `/na/summit-online/` |
+| landing-page | `/na/`, `/na/attend/`, `/na/certifications/`, `/na/preconference/`, `/na/speakers/online/`, `/na/faq/online/` |
+| logo-directory | `/na/sponsors/online/` |
+| form-page | `/na/become-a-sponsor/`, `/na/become-a-sponsor/thank-you/` |
+| faq-page | `/na/faq/` |
+
+Supporting content: `/drafts/ema-poc/fragments/speakers-online-1..3`, `/drafts/ema-poc/media/sponsors-online/`.
+
+Shared navigation and footer are not built by page import and were not migrated.
+
+## Redirecting sitemap URLs
+
+Not migrated. Links to them stay absolute `https://summit.adobe.com/...` (except `/`, which points to `/drafts/ema-poc/na`). Details: `migration-work/scope/redirects.json` in the console workspace.
+
+| Type | URLs | Target |
 |---|---|---|
-| Home | `/`, `/na/` | Hero video, register CTA, event dates |
-| Agenda / catalog | `/na/agenda/`, `/na/sessions/`, `/na/agendas-by-role/`, `/na/agendas-by-role/email/`, `/na/agendas-by-role/media/` | Session data is loaded dynamically on the source; migrate the static shell and flag the dynamic parts |
-| Persona / topic landing | `/na/email/`, `/na/media/`, `/na/nab/`, `/na/summit-online/`, `/na/ai-at-summit/`, `/na/ai-at-summit/email/`, `/na/certifications/`, `/na/certifications/media/`, `/na/preconference/`, `/na/preconference/media/` | The `/email/` and `/media/` children are variants of their parent page |
-| Speakers | `/na/speakers/`, `/na/speakers/online/` | Speaker cards open a detail panel on the right side |
-| Sponsors | `/na/sponsors/`, `/na/sponsors/online/`, `/na/sponsors/sponsorship/`, `/na/become-a-sponsor/`, `/na/become-a-sponsor/thank-you/` | Logo grids and sponsorship tiers |
-| Info / logistics | `/na/attend/`, `/na/pricing/`, `/na/hotels/`, `/na/faq/`, `/na/faq/online/`, `/na/mailing/` | FAQ uses accordions; pricing uses comparison tables |
-
-## Batches
-
-| Batch | Pages | How |
-|---|---|---|
-| 1 – one per template | `/na/`, `/na/agenda/`, `/na/sessions/`, `/na/speakers/`, `/na/sponsors/`, `/na/ai-at-summit/`, `/na/attend/`, `/na/pricing/`, `/na/hotels/`, `/na/faq/` | Auto mode run |
-| 2 – variants | `/na/email/`, `/na/media/`, `/na/nab/`, `/na/summit-online/`, `/na/ai-at-summit/email/`, `/na/certifications/`, `/na/certifications/media/`, `/na/preconference/`, `/na/preconference/media/`, `/na/agendas-by-role/`, `/na/agendas-by-role/email/`, `/na/agendas-by-role/media/` | Guided, reuse Batch 1 blocks |
-| 3 – remainder | `/`, `/na/speakers/online/`, `/na/sponsors/online/`, `/na/sponsors/sponsorship/`, `/na/become-a-sponsor/`, `/na/become-a-sponsor/thank-you/`, `/na/faq/online/`, `/na/mailing/` | Guided or a second Auto run |
-
-Shared navigation and footer are not built by page import; build them once from `/na/`.
+| Server 301 | `/na/agendas-by-role/`, `/na/agendas-by-role/email/`, `/na/agendas-by-role/media/`, `/na/email/`, `/na/nab/` | `https://business.adobe.com/summit/adobe-summit.html` |
+| Client-side (meta refresh, canonical `/na/`) | `/`, `/na/ai-at-summit/`, `/na/ai-at-summit/email/`, `/na/certifications/media/`, `/na/mailing/`, `/na/media/`, `/na/preconference/media/`, `/na/sessions/`, `/na/speakers/`, `/na/sponsors/sponsorship/` | `/na/` |
 
 ## Out of scope for the POC
 
-Registration, sign-in, personalized schedules, and live session data (ESP/ESL APIs). Keep links to the source site for these and list them as gaps.
+Registration, sign-in, personalized schedules, and live session data (ESP/ESL APIs). Keep links to the source site for these and list them as gaps in `project/blocks.md`.
