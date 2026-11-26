@@ -1,0 +1,156 @@
+/* Summit Sponsor Logos: uncropped, linked logo grid (one block per sponsor tier). */
+
+.summit-sponsor-logos {
+  --ssl-gap: var(--s2a-spacing-xs, 8px);
+  --ssl-tile-bg: #f8f8f8; /* source tile colour */
+  --ssl-radius: var(--s2a-border-radius-md, 16px);
+  --ssl-columns: 2;
+  --ssl-ratio: 3 / 2;
+
+  width: 100%;
+}
+
+/* space between consecutive tiers */
+.summit-sponsor-logos:not(:first-child) { margin-block-start: var(--s2a-spacing-3xl, 64px); }
+
+.summit-sponsor-logos.large { --ssl-ratio: 4 / 3; }
+.summit-sponsor-logos.small { --ssl-columns: 3; }
+
+.summit-sponsor-logos .summit-sponsor-logos-header {
+  text-align: center;
+  margin-block-end: var(--s2a-spacing-md, 24px);
+}
+
+.summit-sponsor-logos .summit-sponsor-logos-header :is(h2, h3) {
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.2;
+}
+
+.summit-sponsor-logos .summit-sponsor-logos-header > :first-child { margin-block-start: 0; }
+.summit-sponsor-logos .summit-sponsor-logos-header > :last-child { margin-block-end: 0; }
+
+.summit-sponsor-logos .summit-sponsor-logos-list {
+  display: grid;
+  grid-template-columns: repeat(var(--ssl-columns), minmax(0, 1fr));
+  gap: var(--ssl-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summit-sponsor-logos .summit-sponsor-logos-item {
+  margin: 0;
+  min-width: 0;
+}
+
+.summit-sponsor-logos .summit-sponsor-logos-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: var(--ssl-ratio);
+  padding: 12%;
+  box-sizing: border-box;
+  background: var(--ssl-tile-bg);
+  border-radius: var(--ssl-radius);
+  transition: background-color 0.2s ease;
+}
+
+.summit-sponsor-logos a.summit-sponsor-logos-tile:hover { background-color: #efefef; }
+
+.summit-sponsor-logos a.summit-sponsor-logos-tile:focus-visible {
+  outline: 2px solid var(--s2a-color-focus-ring, #1473e6);
+  outline-offset: 2px;
+}
+
+.summit-sponsor-logos .summit-sponsor-logos-tile picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.summit-sponsor-logos .summit-sponsor-logos-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+
+  /* logos exported on white blend into the tile instead of showing a white box */
+  mix-blend-mode: multiply;
+}
+
+/* ticker: one auto-scrolling row */
+.summit-sponsor-logos.ticker .summit-sponsor-logos-viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.summit-sponsor-logos.ticker .summit-sponsor-logos-track {
+  display: flex;
+  gap: var(--ssl-gap);
+  width: max-content;
+  animation: summit-sponsor-logos-scroll 40s linear infinite;
+}
+
+.summit-sponsor-logos.ticker .summit-sponsor-logos-list {
+  display: flex;
+  gap: var(--ssl-gap);
+}
+
+.summit-sponsor-logos.ticker .summit-sponsor-logos-item { width: 180px; }
+
+.summit-sponsor-logos.ticker.is-paused .summit-sponsor-logos-track,
+.summit-sponsor-logos.ticker .summit-sponsor-logos-viewport:hover .summit-sponsor-logos-track,
+.summit-sponsor-logos.ticker .summit-sponsor-logos-viewport:focus-within .summit-sponsor-logos-track {
+  animation-play-state: paused;
+}
+
+.summit-sponsor-logos.ticker .summit-sponsor-logos-toggle {
+  display: block;
+  margin: var(--s2a-spacing-sm, 16px) auto 0;
+  padding: 6px 16px;
+  font: inherit;
+  font-size: 14px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.summit-sponsor-logos.ticker .summit-sponsor-logos-toggle[hidden] { display: none; }
+
+@keyframes summit-sponsor-logos-scroll {
+  from { transform: translateX(0); }
+
+  /* one list width plus one gap: the hidden copy starts exactly where the first one did */
+  to { transform: translateX(calc(-50% - var(--ssl-gap) / 2)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summit-sponsor-logos.ticker .summit-sponsor-logos-viewport { mask-image: none; }
+
+  .summit-sponsor-logos.ticker .summit-sponsor-logos-track {
+    width: auto;
+    animation: none;
+  }
+
+  /* no motion: show the logos as a normal grid */
+  .summit-sponsor-logos.ticker .summit-sponsor-logos-list { display: grid; }
+
+  .summit-sponsor-logos.ticker .summit-sponsor-logos-list[aria-hidden='true'] { display: none; }
+  .summit-sponsor-logos.ticker .summit-sponsor-logos-item { width: auto; }
+}
+
+@media (width >= 600px) {
+  .summit-sponsor-logos { --ssl-columns: 4; }
+  .summit-sponsor-logos.large { --ssl-columns: 3; }
+  .summit-sponsor-logos.small { --ssl-columns: 4; }
+}
+
+@media (width >= 1200px) {
+  .summit-sponsor-logos { --ssl-columns: 5; }
+  .summit-sponsor-logos.large { --ssl-columns: 4; }
+  .summit-sponsor-logos.small { --ssl-columns: 6; }
+}
