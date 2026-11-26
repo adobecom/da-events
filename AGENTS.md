@@ -1,11 +1,13 @@
 # AGENTS.md
 
-`da-events`: Adobe events pages on Edge Delivery Services with Document Authoring (DA). Code is served under `/events/`; pages load Milo (`LIBS`) and event-libs (`EVENT_LIBS`) at runtime from `events/scripts/scripts.js`. There is no local `blocks/` folder: blocks come from Milo and event-libs.
+`da-events`: Adobe events pages on Edge Delivery Services with Document Authoring (DA). Code is served under `/events/` (`codeRoot: '/events'`); pages load Milo (`LIBS`) and event-libs (`EVENT_LIBS`) at runtime from `events/scripts/scripts.js`. Milo resolves each block by name: Milo blocks from `LIBS`, event-libs blocks from `EVENT_LIBS`, and any other name from `/events/blocks/<name>/<name>.js` and `.css`.
 
 ## Code rules
 - Entry points: `head.html`, `events/scripts/scripts.js`, `events/scripts/utils.js`, `events/styles/styles.css`. Read them before changing loading behavior.
 - Resolve Milo through `LIBS` and event-libs through `EVENT_LIBS`; never hard-code their URLs.
-- New or changed blocks belong in [adobecom/event-libs](https://github.com/adobecom/event-libs) (`event-libs/v1/blocks/`) or Milo, not here. For this POC, if a block is missing, describe the gap and propose it; don't add block code to this repo.
+- **New blocks go only in `events/blocks/<name>/`** (`<name>.js` with `export default async function init(el)`, plus `<name>.css`). Don't change any other code file (`head.html`, `events/scripts/`, `events/styles/`, `events/create-now/`, config) without asking first.
+- A new block name must not match any Milo (`libs/blocks/`) or event-libs (`event-libs/v1/blocks/`, `event-libs/v1/c2/blocks/`) block name; those load first and would shadow it. Prefix POC blocks with `summit-` (for example `summit-hotel-list`).
+- Create a new block only when no Milo or event-libs block fits, and record it in `project/blocks.md` (Gaps and "New blocks in this repo"). Scope CSS to the block's class; follow Milo patterns (`createTag` from `${LIBS}/utils/utils.js`, ES modules, no build step).
 - `.hlxignore` excludes markdown; all other committed files are served.
 
 ## EMA POC (branch `ema-poc` only)
@@ -29,7 +31,7 @@ Read these files when the task needs them:
 | `project/decisions.md` | Before changing an agreed convention |
 
 ## After each request
-- Don't commit or push. This POC changes content only; migration scaffolding (import scripts, `catalog/`, `.hlxignore` edits) stays in the console workspace.
-- If a code change seems needed, describe it and stop; a developer will push it via PR to `ema-poc`. Never push to `main`, `stage`, or `dev`.
+- Commit only `events/blocks/**` and `project/*.md` changes, with a message that summarizes the request. Push **only to `ema-poc`** (current branch, or a PR into `ema-poc`). Never push to `main`, `stage`, `dev`, or any other branch.
+- Never commit migration scaffolding: import scripts, `catalog/`, `migration-work/`, `.hlxignore` edits. They stay in the console workspace.
 - If pages changed, list them and ask whether to upload them to Experience Workspace (only under `/drafts/ema-poc/`).
 - Keep answers short: what changed, where, and anything that needs a decision.

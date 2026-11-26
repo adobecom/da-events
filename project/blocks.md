@@ -28,7 +28,7 @@ Pages load blocks from Milo and event-libs at runtime. Use their names and autho
 
 ## Gaps
 
-When no block fits, don't build one here. Add a row below with the source URL, what's missing, and the closest block used instead.
+When no Milo or event-libs block fits, add a row below with the source URL, what's missing, and the closest block used (or the new `summit-*` block created in `events/blocks/`).
 
 | Source page | Missing capability | Closest block used |
 |---|---|---|
@@ -48,3 +48,10 @@ When no block fits, don't build one here. Add a row below with the source URL, w
 | `https://summit.adobe.com/na/become-a-sponsor/` | Sponsorship interest form (Salesforce web-to-lead). event-libs `events-form` is the event RSVP form; Milo `marketo`/`faas` need a configured form. | Default content (form heading and intro); fields dropped |
 | `https://summit.adobe.com/na/become-a-sponsor/` | Adobe TV video beside text. | Milo `media` with a `video.tv.adobe.com` link (Milo adobetv embed) |
 | `https://summit.adobe.com/na/sponsors/online/` | 2026 sponsor tiers with detail side panel. | event-libs `image-links` per tier; logos link to the sponsor site. 11 SVG logos over Edge Delivery's SVG limit were rendered to PNG and stored at `/drafts/ema-poc/media/sponsors-online/` (`summit-logo-overrides.js`) |
+
+## New blocks in this repo
+
+Blocks under `events/blocks/` created for this POC. Keep each entry short: name, purpose, authoring structure, pages that use it.
+
+| Block | Purpose | Authoring | Used on |
+|---|---|---|---|
