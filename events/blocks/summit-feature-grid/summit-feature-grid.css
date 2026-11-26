@@ -1,0 +1,101 @@
+/* Summit Feature Grid: tight bento of feature tiles (photo on top, text below, grey card). */
+
+.summit-feature-grid {
+  --sfg-gap: var(--s2a-spacing-xs, 8px);
+  --sfg-tile-bg: #f8f8f8; /* source tile colour */
+  --sfg-radius: var(--s2a-border-radius-md, 16px);
+  --sfg-pad: var(--s2a-spacing-md, 24px);
+
+  width: 100%;
+}
+
+.summit-feature-grid .summit-feature-grid-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sfg-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summit-feature-grid .summit-feature-grid-tile {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--sfg-tile-bg);
+  border-radius: var(--sfg-radius);
+}
+
+.summit-feature-grid .summit-feature-grid-media picture,
+.summit-feature-grid .summit-feature-grid-media img {
+  display: block;
+  width: 100%;
+  height: auto; /* keep the photo's own ratio: never cropped */
+}
+
+.summit-feature-grid .summit-feature-grid-body {
+  padding: var(--sfg-pad) var(--sfg-pad) calc(var(--sfg-pad) + 8px);
+}
+
+.summit-feature-grid .summit-feature-grid-text > :first-child { margin-block-start: 0; }
+
+.summit-feature-grid .summit-feature-grid-text :is(h2, h3, h4) {
+  margin: 0 0 var(--s2a-spacing-2xs, 4px);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.summit-feature-grid .summit-feature-grid-text p,
+.summit-feature-grid .summit-feature-grid-topics {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--s2a-color-content-subtle, #505050);
+}
+
+.summit-feature-grid .summit-feature-grid-text p + p { margin-block-start: var(--s2a-spacing-xs, 8px); }
+
+.summit-feature-grid .summit-feature-grid-text .summit-feature-grid-cta {
+  margin-block-start: var(--s2a-spacing-sm, 16px);
+}
+
+.summit-feature-grid .summit-feature-grid-cta a {
+  font-weight: 700;
+  color: var(--s2a-color-content-default, #000);
+  text-decoration: none;
+}
+
+.summit-feature-grid .summit-feature-grid-cta a::after { content: ' \203A'; }
+.summit-feature-grid .summit-feature-grid-cta a:hover { text-decoration: underline; }
+
+.summit-feature-grid .summit-feature-grid-topics {
+  margin-block-start: var(--s2a-spacing-sm, 16px);
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: var(--s2a-spacing-md, 24px);
+}
+
+.summit-feature-grid .summit-feature-grid-topics li { break-inside: avoid; }
+
+@media (width >= 768px) {
+  .summit-feature-grid .summit-feature-grid-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summit-feature-grid .summit-feature-grid-tile.wide { grid-column: 1 / -1; }
+}
+
+@media (width >= 1024px) {
+  /* wide tile with topics: title and text left, topics in columns on the right */
+  .summit-feature-grid .summit-feature-grid-tile.wide.has-topics .summit-feature-grid-body {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 3fr;
+    column-gap: var(--s2a-spacing-xl, 40px);
+    align-items: start;
+  }
+
+  .summit-feature-grid .summit-feature-grid-tile.wide .summit-feature-grid-topics {
+    margin-block-start: 0;
+    columns: 4;
+  }
+}
